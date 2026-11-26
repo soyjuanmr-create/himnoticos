@@ -1,0 +1,5 @@
+Archivo — Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
+Pirata One — Copyright (c) 2012, Rodrigo Fuenzalida & Nicolas Massi
+
+Ambas tipografías se distribuyen bajo la SIL Open Font License 1.1 (https://openfontlicense.org).
+Archivos obtenidos de Fontsource (subconjunto latin).
