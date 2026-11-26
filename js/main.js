@@ -47,73 +47,140 @@
   }, { passive: true });
 
   /* ------------------------------------------------------------------
-     Campo de rayas del hero: las cinco rayas del logo, repetidas y en
-     movimiento continuo a través de la silueta del rayo.
-     Coordenadas tomadas del logo (caja de 900 x 900).
+     El rayo: las cinco rayas del logo (caja de 900 x 900), repetidas y
+     en movimiento continuo a través de su silueta. La intro y el fondo
+     del hero lo dibujan con la misma función, para pasar de una a otro
+     sin corte.
      ------------------------------------------------------------------ */
+  const STEP = 0.25;
+  const ease3 = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+  // Dónde cae la caja del logo dentro de un lienzo de W x H
+  function heroMap(W, H) {
+    const small = W < 760;
+    const s = small ? H / 1020 : Math.max(H / 850, W / 1750);
+    return { s, ox: (small ? W * 0.58 : W * 0.7) - 450 * s, oy: (H - 900 * s) / 2 - H * (small ? 0.1 : 0.02) };
+  }
+  function introMap(W, H) {
+    const s = Math.min(H / 900, W / 620);   // centrado y a toda pantalla
+    return { s, ox: W / 2 - 425 * s, oy: (H - 900 * s) / 2 - H * 0.04 };
+  }
+
+  // Traza una polilínea hasta la fracción p de su longitud
+  function tracePath(ctx, pts, p) {
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    if (p >= 1) {
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      return;
+    }
+    const len = [];
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      len.push(l);
+      total += l;
+    }
+    let rem = total * p;
+    for (let i = 0; i < len.length; i++) {
+      const a = pts[i], b = pts[i + 1];
+      if (rem >= len[i]) { ctx.lineTo(b[0], b[1]); rem -= len[i]; continue; }
+      const f = rem / len[i];
+      ctx.lineTo(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f);
+      break;
+    }
+  }
+
+  /* o: s, ox, oy  posición y escala de la caja del logo
+        lean       inclinación hacia el puntero (-1..1)
+        flow       avance de las rayas
+        far        0..1, cuánto se ve el campo de rayas fuera del logo
+        dim        atenuación general
+        heat       0..1, al rojo blanco (recién caído el rayo)
+        prog       opcional: fracción dibujada de cada raya, por índice */
+  function drawBolt(ctx, dpr, o) {
+    const { s, ox, oy } = o;
+    const upx = 0.62 + o.lean * 0.09;
+    const pulse = 1 + S.energy * 0.6;
+    const phase = ((o.flow % STEP) + STEP) % STEP;
+    const tip = [ox + (175 + o.lean * 30) * s, oy + 1162 * s];
+    const heat = o.heat || 0;
+
+    ctx.lineJoin = 'miter';
+    ctx.miterLimit = 8;
+    ctx.lineCap = 'butt';
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (let k = -13; k <= 19; k++) {
+      const u = k * STEP + phase;
+      const d = Math.abs(u - 0.5);
+      const fade = 1 - smooth(1.4, 4.4, d);
+      if (fade <= 0) continue;
+      const win = 1 - smooth(0.5, 0.82, d);   // 1 dentro de la silueta del logo
+      const vis = lerp(o.far, 1, win);
+      const prog = o.prog ? o.prog(k) : 1;
+      if (vis < 0.004 || prog <= 0) continue;
+
+      const Lx = 105 + u * 363, Ly = 570 - u * 235;
+      const Rx = 435 + u * 310, Ry = 500 - u * 217;
+      const up = Math.max(60, Ly + (oy + 60) / s);   // sube hasta salir por arriba del lienzo
+      const pts = [
+        [ox + (Lx + up * upx) * s, oy + (Ly - up) * s],
+        [ox + Lx * s, oy + Ly * s],
+        [ox + Rx * s, oy + Ry * s],
+        tip
+      ];
+      const w = (1.3 + 1.7 * win + 9 * Math.exp(-Math.pow((u - 0.5) / 0.25, 2))) * s * pulse;
+      const a = (0.13 + 0.87 * win) * fade * vis * o.dim;
+
+      tracePath(ctx, pts, prog);
+      if (win > 0.02) {
+        ctx.strokeStyle = `rgba(242,110,38,${Math.min(1, a * 0.13 * win * (1 + heat * 2.5)).toFixed(3)})`;
+        ctx.lineWidth = w * 3.6 + 6;
+        ctx.stroke();
+      }
+      const hot = heat * win;
+      const r = Math.round(lerp(lerp(196, 248, win), 255, hot));
+      const g = Math.round(lerp(lerp(58, 116, win), 232, hot));
+      const b = Math.round(lerp(lerp(26, 40, win), 205, hot));
+      if (hot > 0.03) {
+        ctx.shadowColor = `rgba(255,120,40,${Math.min(1, hot).toFixed(2)})`;
+        ctx.shadowBlur = 34 * hot * dpr;
+      }
+      ctx.strokeStyle = `rgba(${r},${g},${b},${a.toFixed(3)})`;
+      ctx.lineWidth = w;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* Fondo del hero */
   function initField() {
     const cv = $('.hero__field');
-    if (!cv) return { start() {} };
+    if (!cv) return { show() {}, takeover() {} };
     const ctx = cv.getContext('2d');
-    const STEP = 0.25;
-    let W = 0, H = 0, flow = 0, lean = 0, visible = true;
-    let alpha = RM ? 1 : 0, target = alpha;
+    const MOVE = 1300;                                  // ms que tarda en ir de la intro a su sitio
+    let W = 0, H = 0, dpr = 1, visible = true, shown = false;
+    let flow = 0, lean = 0, mix = 1, moveT0 = 0;        // mix: 0 = posición de la intro, 1 = la del hero
 
     function draw() {
       ctx.clearRect(0, 0, W, H);
-      if (alpha < 0.004) return;
-      const small = W < 760;
-      const s = small ? H / 1020 : Math.max(H / 850, W / 1750);
-      const ox = (small ? W * 0.58 : W * 0.7) - 450 * s;
-      const oy = (H - 900 * s) / 2 - H * (small ? 0.1 : 0.02);
-      const upx = 0.62 + lean * 0.09;
-      const pulse = 1 + S.energy * 0.6;
-      const phase = ((flow % STEP) + STEP) % STEP;
-      const tipX = ox + (175 + lean * 30) * s;
-      const tipY = oy + 1162 * s;
-
-      ctx.lineJoin = 'miter';
-      ctx.miterLimit = 8;
-      ctx.lineCap = 'butt';
-      ctx.globalCompositeOperation = 'lighter';
-
-      for (let k = -13; k <= 19; k++) {
-        const u = k * STEP + phase;
-        const d = Math.abs(u - 0.5);
-        const far = 1 - smooth(1.4, 4.4, d);
-        if (far <= 0) continue;
-        const win = 1 - smooth(0.5, 0.82, d);   // 1 dentro de la silueta del logo
-
-        const Lx = 105 + u * 363, Ly = 570 - u * 235;
-        const Rx = 435 + u * 310, Ry = 500 - u * 217;
-        const Ty = -500, Tx = Lx + (Ly - Ty) * upx;
-        const w = (1.3 + 1.7 * win + 9 * Math.exp(-Math.pow((u - 0.5) / 0.25, 2))) * s * pulse;
-        const a = (0.13 + 0.87 * win) * far * alpha * (small ? 0.8 : 1);
-
-        ctx.beginPath();
-        ctx.moveTo(ox + Tx * s, oy + Ty * s);
-        ctx.lineTo(ox + Lx * s, oy + Ly * s);
-        ctx.lineTo(ox + Rx * s, oy + Ry * s);
-        ctx.lineTo(tipX, tipY);
-
-        if (win > 0.02) {
-          ctx.strokeStyle = `rgba(242,110,38,${(a * 0.13 * win).toFixed(3)})`;
-          ctx.lineWidth = w * 3.6 + 6;
-          ctx.stroke();
-        }
-        const r = Math.round(lerp(196, 248, win));
-        const g = Math.round(lerp(58, 116, win));
-        const b = Math.round(lerp(26, 40, win));
-        ctx.strokeStyle = `rgba(${r},${g},${b},${a.toFixed(3)})`;
-        ctx.lineWidth = w;
-        ctx.stroke();
+      if (!shown) return;
+      const hero = heroMap(W, H);
+      let m = hero, far = 1, dim = W < 760 ? 0.8 : 1;
+      if (mix < 1) {
+        const from = introMap(W, innerHeight), e = ease3(mix);
+        m = { s: lerp(from.s, hero.s, e), ox: lerp(from.ox, hero.ox, e), oy: lerp(from.oy, hero.oy, e) };
+        far = mix;
+        dim = lerp(1, dim, e);
       }
-      ctx.globalCompositeOperation = 'source-over';
+      drawBolt(ctx, dpr, { s: m.s, ox: m.ox, oy: m.oy, lean, flow, far, dim, heat: 0 });
     }
 
     function resize() {
       const rect = cv.getBoundingClientRect();
-      const dpr = Math.min(devicePixelRatio || 1, 2);
+      dpr = Math.min(devicePixelRatio || 1, 2);
       W = rect.width; H = rect.height;
       cv.width = Math.round(W * dpr);
       cv.height = Math.round(H * dpr);
@@ -130,14 +197,21 @@
 
     if (!RM) {
       subs.push((now, dt) => {
-        if (!visible) return;
-        flow += (0.07 + Math.min(1.4, Math.abs(S.sv) * 0.45) + S.energy * 0.8) * dt / 1000;
-        lean = lerp(lean, (S.mx - 0.5) * 2, 0.045);
-        alpha = lerp(alpha, target, 0.035);
+        if (!visible || !shown) return;
+        if (mix < 1) mix = Math.min(1, (now - moveT0) / MOVE);
+        const speed = 0.07 + Math.min(1.4, Math.abs(S.sv) * 0.45) + S.energy * 0.8;
+        flow += speed * mix * mix * dt / 1000;
+        lean = lerp(lean, (S.mx - 0.5) * 2 * mix, 0.045);
         draw();
       });
     }
-    return { start() { target = 1; } };
+
+    return {
+      // sin intro: directamente en su sitio
+      show() { shown = true; mix = 1; draw(); },
+      // releva a la intro en su misma posición y se desliza hasta la del hero
+      takeover(now) { shown = true; mix = 0; moveT0 = now; flow = 0; lean = 0; draw(); }
+    };
   }
 
   /* ------------------------------------------------------------------
@@ -171,12 +245,149 @@
   }
 
   /* ------------------------------------------------------------------
+     Electricidad en el título: al pasar el ratón, la letra se carga y
+     saltan descargas desde su contorno
+     ------------------------------------------------------------------ */
+  function initZap(strike) {
+    const word = $('[data-title]');
+    if (!word || !FINE || RM) return;
+    const box = word.parentElement;
+    const chars = $$('.ch', word);
+    let geo = [];        // por letra: puntos del contorno [x, y, nx, ny], con x e y relativos a su caja
+    let stale = true;
+    let cur = -1, next = 0, offTimer = 0;
+
+    // Contorno real de la letra (y hacia dónde queda el exterior), leído de un lienzo auxiliar
+    function outline(ch, fs, font, baseline) {
+      const w = ch.offsetWidth, h = ch.offsetHeight;
+      const pad = Math.ceil(fs * 0.3);
+      const c = doc.createElement('canvas');
+      c.width = Math.ceil(w) + pad * 2;
+      c.height = Math.ceil(h) + pad * 2;
+      const x = c.getContext('2d', { willReadFrequently: true });
+      x.font = font;
+      x.textBaseline = 'alphabetic';
+      // si el lienzo no reproduce el ancho real de la letra, no sirve
+      if (Math.abs(x.measureText(ch.textContent).width - w) > w * 0.08) return null;
+      x.fillText(ch.textContent, pad, pad + baseline);
+      const data = x.getImageData(0, 0, c.width, c.height).data;
+      const on = (px, py) => px >= 0 && py >= 0 && px < c.width && py < c.height && data[(py * c.width + px) * 4 + 3] > 128;
+      const st = Math.max(2, Math.round(fs / 60));
+      const pts = [];
+      for (let py = 0; py < c.height; py += st) {
+        for (let px = 0; px < c.width; px += st) {
+          if (!on(px, py)) continue;
+          let nx = 0, ny = 0;
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              if ((dx || dy) && !on(px + dx * st, py + dy * st)) { nx += dx; ny += dy; }
+            }
+          }
+          const n = Math.hypot(nx, ny);
+          if (n < 0.5) continue;   // interior de la letra (o trazo demasiado fino)
+          pts.push([(px - pad) / w, (py - pad) / h, nx / n, ny / n]);
+        }
+      }
+      return pts.length > 12 ? pts : null;
+    }
+
+    // Alternativa: el borde de la caja de la letra
+    function boxOutline() {
+      const pts = [];
+      for (let i = 0; i <= 12; i++) {
+        const f = i / 12;
+        pts.push([0.08, f, -1, 0], [0.92, f, 1, 0], [f, 0.1, 0, -1], [f, 0.95, 0, 1]);
+      }
+      return pts;
+    }
+
+    function rebuild() {
+      const fs = parseFloat(getComputedStyle(box).fontSize);
+      const cs = getComputedStyle(chars[0]);
+      const font = `${cs.fontWeight} ${fs}px ${cs.fontFamily}`;
+      const probe = doc.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      word.appendChild(probe);
+      const baseY = probe.getBoundingClientRect().top;
+      word.removeChild(probe);
+      geo = chars.map(ch => {
+        const r = ch.getBoundingClientRect();
+        const k = r.height / (ch.offsetHeight || 1) || 1;
+        return outline(ch, fs, font, (baseY - r.top) / k) || boxOutline();
+      });
+    }
+
+    function setLive(i) {
+      if (i === cur) return;
+      if (cur >= 0) chars[cur].classList.remove('is-live');
+      cur = i;
+      if (cur >= 0) { chars[cur].classList.add('is-live'); next = 0; }
+    }
+
+    addEventListener('resize', () => { stale = true; });
+    box.addEventListener('pointermove', e => {
+      if (!box.classList.contains('is-ready')) return;   // aún está entrando
+      if (stale) { rebuild(); stale = false; }
+      clearTimeout(offTimer);
+      const ch = e.target.closest ? e.target.closest('.ch') : null;
+      if (ch) setLive(chars.indexOf(ch));
+    });
+    box.addEventListener('pointerleave', () => { offTimer = setTimeout(() => setLive(-1), 90); });
+
+    subs.push(now => {
+      if (cur < 0 || now < next || !geo[cur]) return;
+      next = now + 40 + Math.random() * 60;
+      const r = chars[cur].getBoundingClientRect();
+      const g = geo[cur];
+      const size = r.height;
+      const at = p => [r.left + p[0] * r.width, r.top + p[1] * r.height];
+      // punto del contorno al azar, con preferencia por los cercanos al puntero
+      const near = () => {
+        let best = null, bd = Infinity;
+        for (let i = 0; i < 4; i++) {
+          const p = g[(Math.random() * g.length) | 0], q = at(p);
+          const d = Math.hypot(q[0] - S.px, q[1] - S.py);
+          if (d < bd) { bd = d; best = p; }
+        }
+        return best;
+      };
+
+      const count = Math.random() < 0.5 ? 2 : 1;
+      for (let j = 0; j < count; j++) {
+        const p = near(), a = at(p);
+        if (Math.random() < 0.62) {
+          // descarga: salta del contorno hacia fuera
+          const ang = Math.atan2(p[3], p[2]) + (Math.random() - 0.5) * 1.2;
+          const len = size * (0.2 + Math.random() * 0.45);
+          const b = [a[0] + Math.cos(ang) * len, a[1] + Math.sin(ang) * len];
+          strike.arc([a, b]);
+          if (Math.random() < 0.35) strike.sparks(b[0], b[1], 2);
+        } else {
+          // arco que bordea la letra por fuera hasta otro punto de su contorno
+          for (let tries = 0; tries < 10; tries++) {
+            const q = g[(Math.random() * g.length) | 0], b = at(q);
+            const dist = Math.hypot(b[0] - a[0], b[1] - a[1]);
+            if (dist < size * 0.1 || dist > size * 0.5) continue;
+            const bulge = dist * (0.35 + Math.random() * 0.3);
+            const m = [
+              (a[0] + b[0]) / 2 + (p[2] + q[2]) * 0.5 * bulge,
+              (a[1] + b[1]) / 2 + (p[3] + q[3]) * 0.5 * bulge
+            ];
+            strike.arc([a, m, b]);
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------
      Rayos: un clic en cualquier parte descarga un rayo en ese punto
      ------------------------------------------------------------------ */
   function initStrike() {
     const cv = $('.strike');
     const flash = $('.flash');
-    if (!cv || RM) return { hit() {} };
+    if (!cv || RM) return { hit() {}, arc() {}, burst() {}, sparks() {} };
     const ctx = cv.getContext('2d');
     const bolts = [], sparks = [], rings = [];
     let W = 0, H = 0, lastHit = 0, dirty = false;
@@ -192,7 +403,7 @@
     resize();
 
     // Desplazamiento del punto medio: de una recta a un trazo quebrado
-    function jag(x1, y1, x2, y2, disp, iters) {
+    function jag(x1, y1, x2, y2, disp, iters, iso) {
       let pts = [[x1, y1], [x2, y2]];
       for (let it = 0; it < iters; it++) {
         const out = [pts[0]];
@@ -200,7 +411,7 @@
           const a = pts[i], b = pts[i + 1];
           out.push([
             (a[0] + b[0]) / 2 + (Math.random() - 0.5) * disp,
-            (a[1] + b[1]) / 2 + (Math.random() - 0.5) * disp * 0.35
+            (a[1] + b[1]) / 2 + (Math.random() - 0.5) * disp * (iso ? 1 : 0.35)
           ], b);
         }
         pts = out;
@@ -209,6 +420,24 @@
       return pts;
     }
 
+    function flashAt(x, y) {
+      if (!flash) return;
+      flash.style.setProperty('--fx', x + 'px');
+      flash.style.setProperty('--fy', y + 'px');
+      flash.classList.remove('go');
+      void flash.offsetWidth;
+      flash.classList.add('go');
+    }
+
+    function sparksAt(x, y, n) {
+      const now = performance.now();
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, sp = 0.12 + Math.random() * 0.5;
+        sparks.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.22, born: now, life: 380 + Math.random() * 380 });
+      }
+    }
+
+    // Rayo completo: cae desde arriba hasta el punto
     function hit(x, y) {
       const now = performance.now();
       if (now - lastHit < 340) return;   // nunca más de tres destellos por segundo
@@ -224,21 +453,29 @@
         const len = 70 + Math.random() * 190;
         lines.push({ pts: jag(p[0], p[1], p[0] + Math.cos(ang) * len, p[1] + Math.sin(ang) * len, len * 0.3, 4), w: 1.4 });
       }
-      bolts.push({ born: now, life: 480, lines });
+      bolts.push({ born: now, life: 480, blur: 26, lines });
       rings.push({ x, y, born: now, life: 560 });
-      for (let i = 0; i < 16; i++) {
-        const a = Math.random() * Math.PI * 2, sp = 0.12 + Math.random() * 0.5;
-        sparks.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.22, born: now, life: 380 + Math.random() * 380 });
-      }
-
+      sparksAt(x, y, 16);
       S.energy = 1;
-      if (flash) {
-        flash.style.setProperty('--fx', x + 'px');
-        flash.style.setProperty('--fy', y + 'px');
-        flash.classList.remove('go');
-        void flash.offsetWidth;
-        flash.classList.add('go');
+      flashAt(x, y);
+    }
+
+    // Arco corto que pasa por una serie de puntos (electricidad sobre el título)
+    function arc(way) {
+      let pts = [];
+      for (let i = 0; i < way.length - 1; i++) {
+        const a = way[i], b = way[i + 1];
+        const leg = jag(a[0], a[1], b[0], b[1], Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.42, 3, true);
+        pts = pts.concat(i ? leg.slice(1) : leg);
       }
+      bolts.push({ born: performance.now(), life: 120 + Math.random() * 140, blur: 14, lines: [{ pts, w: 1.5 + Math.random() * 1.3 }] });
+    }
+
+    // Destello y chispas sin rayo (impacto de la intro)
+    function burst(x, y) {
+      lastHit = performance.now();
+      flashAt(x, y);
+      sparksAt(x, y, 22);
     }
 
     subs.push((now, dt) => {
@@ -261,7 +498,7 @@
           ctx.moveTo(ln.pts[0][0], ln.pts[0][1]);
           for (let j = 1; j < ln.pts.length; j++) ctx.lineTo(ln.pts[j][0], ln.pts[j][1]);
           ctx.shadowColor = 'rgba(242,110,38,.95)';
-          ctx.shadowBlur = 26;
+          ctx.shadowBlur = b.blur;
           ctx.strokeStyle = `rgba(255,128,48,${a.toFixed(3)})`;
           ctx.lineWidth = ln.w * 2.4;
           ctx.stroke();
@@ -306,7 +543,7 @@
       hit(e.clientX, e.clientY);
     });
 
-    return { hit };
+    return { hit, arc, burst, sparks: sparksAt };
   }
 
   /* ------------------------------------------------------------------
@@ -555,23 +792,67 @@
   }
 
   /* ------------------------------------------------------------------
-     Intro: el rayo se dibuja, la pantalla se parte y aparece la home
+     Intro: el rayo del logo cae desde arriba, enciende el nombre y se
+     desliza a su sitio en el hero mientras aparece la home
      ------------------------------------------------------------------ */
-  function runLoader(done) {
+  function runIntro(field, strike) {
     const loader = $('.loader');
-    const finish = () => { root.classList.add('is-in'); done(); };
-    if (!loader || RM) { if (loader) loader.remove(); finish(); return; }
+    const cv = loader && $('.loader__field', loader);
+    const enter = () => {
+      root.classList.add('is-in');
+      // terminada la entrada de las letras, el título ya puede desbordar (brillos)
+      setTimeout(() => { const n = $('.hero__name'); if (n) n.classList.add('is-ready'); }, RM ? 0 : 2400);
+    };
+    if (!loader || !cv || RM) {
+      if (loader) loader.remove();
+      field.show();
+      enter();
+      return;
+    }
+
+    const ctx = cv.getContext('2d');
+    let W = 0, H = 0, dpr = 1;
+    const resize = () => {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      W = innerWidth; H = innerHeight;
+      cv.width = Math.round(W * dpr);
+      cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    addEventListener('resize', resize);
+
+    const FALL = 430;    // ms que tarda cada raya en caer
+    const GAP = 65;      // desfase entre rayas, del centro hacia fuera
+    const LIT = 560;     // se enciende el nombre
+    const HOLD = 1700;   // el hero toma el relevo
+    let t0 = 0, struck = false, lit = false, over = false;
 
     const wait = ms => new Promise(r => setTimeout(r, ms));
     const fonts = doc.fonts && doc.fonts.ready ? Promise.race([doc.fonts.ready, wait(2500)]) : Promise.resolve();
-    Promise.all([wait(1250), fonts]).then(() => {
-      loader.classList.add('crack');
-      return wait(300);
-    }).then(() => {
-      loader.classList.add('open');
-      finish();
-      return wait(1100);
-    }).then(() => loader.remove());
+    Promise.all([wait(120), fonts]).then(() => { t0 = performance.now(); });
+
+    subs.push(now => {
+      if (over || !t0) return;
+      const t = now - t0;
+      const m = introMap(W, H);
+      const prog = k => (k < 0 || k > 4 ? 0 : Math.pow(clamp((t - Math.abs(k - 2) * GAP) / FALL, 0, 1), 2.2));
+      const heat = t < FALL ? 0.85 : Math.max(0, 1 - (t - FALL) / 650);
+
+      ctx.clearRect(0, 0, W, H);
+      drawBolt(ctx, dpr, { s: m.s, ox: m.ox, oy: m.oy, lean: 0, flow: 0, far: 0, dim: 1, heat, prog });
+
+      if (!struck && t >= FALL) { struck = true; S.energy = 1; strike.burst(W / 2, H * 0.7); }
+      if (!lit && t >= LIT) { lit = true; loader.classList.add('lit'); }
+      if (t >= HOLD) {
+        over = true;
+        removeEventListener('resize', resize);
+        field.takeover(now);             // mismo rayo, misma posición: no se nota el relevo
+        loader.classList.add('out');
+        enter();
+        setTimeout(() => loader.remove(), 600);
+      }
+    });
   }
 
   /* ------------------------------------------------------------------
@@ -580,6 +861,7 @@
   const field = initField();
   const title = initTitle();
   const strike = initStrike();
+  initZap(strike);
   initScrollText();
   initReveal();
   initMagnetic();
@@ -597,15 +879,7 @@
     initMarquees();
   });
 
-  runLoader(() => {
-    field.start();
-    if (!RM) {
-      setTimeout(() => {
-        const small = innerWidth < 760;
-        strike.hit(innerWidth * (small ? 0.62 : 0.72), innerHeight * (small ? 0.36 : 0.42));
-      }, 1150);
-    }
-  });
+  runIntro(field, strike);
 
   requestAnimationFrame(frame);
 })();
