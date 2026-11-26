@@ -407,7 +407,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   color: var(--cream);
 }
 .badge__ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; animation: spin 18s linear infinite; }
-.badge__ring text { font: 700 15px var(--f-sans); font-stretch: 112%; letter-spacing: .04em; fill: currentColor; }
+.badge__ring text { font: 700 13.5px var(--f-sans); font-stretch: 112%; letter-spacing: .04em; fill: currentColor; }
 .badge__bolt { width: 26%; height: 36%; color: var(--orange); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -579,7 +579,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
   .hero { padding-top: 4.6rem; }
   .hero::after { height: 54%; background: linear-gradient(transparent, rgba(10, 9, 8, .88) 60%, var(--bg)); }
-  .hero__meta-mid { display: none; }
   .hero__meta { font-size: .62rem; letter-spacing: .18em; }
   .hero__name { font-stretch: 68%; font-size: 17.6vw; transform: scaleY(1.2); transform-origin: bottom; }
   .hero__los { margin-bottom: .34em; }
