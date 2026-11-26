@@ -141,64 +141,32 @@
   }
 
   /* ------------------------------------------------------------------
-     Título cinético: una ola recorre el ancho (eje wdth) de cada letra
+     Título del hero: se parte en letras para la entrada y se ajusta
+     para llenar el ancho disponible
      ------------------------------------------------------------------ */
-  function initKinetic() {
-    const el = $('[data-kinetic]');
+  function initTitle() {
+    const el = $('[data-title]');
     if (!el) return { fit() {} };
     const box = el.parentElement;
-    const chars = Array.from(el.textContent.trim()).map((c, i) => {
+    const text = el.textContent.trim();
+    el.textContent = '';
+    Array.from(text).forEach((c, i) => {
       const s = doc.createElement('span');
       s.className = 'ch';
       s.textContent = c;
       s.style.setProperty('--i', i);
-      return s;
+      el.appendChild(s);
     });
-    el.textContent = '';
-    chars.forEach(s => el.appendChild(s));
 
-    const n = chars.length;
-    const K = Math.PI * 2 / n;
-    let lo = 66, hi = 125, phase = 0.6, visible = true;
-
-    const apply = () => {
-      const mid = (lo + hi) / 2, amp = (hi - lo) / 2;
-      for (let i = 0; i < n; i++) {
-        chars[i].style.fontStretch = (mid + amp * Math.sin(phase - i * K)).toFixed(1) + '%';
-      }
-    };
-
-    // Ajusta el cuerpo para que la palabra llene el ancho en su estado más ancho
     function fit() {
-      const small = innerWidth < 760;
-      lo = small ? 62 : 66;
-      hi = small ? 104 : 125;
       box.style.fontSize = '100px';
-      const keep = phase;
-      let max = 0;
-      for (let j = 0; j < 12; j++) {
-        phase = j / 12 * Math.PI * 2;
-        apply();
-        max = Math.max(max, el.getBoundingClientRect().width);
-      }
-      phase = keep;
-      if (max > 0) box.style.fontSize = (100 * box.clientWidth / max * 0.995).toFixed(2) + 'px';
-      apply();
+      const natural = el.getBoundingClientRect().width;
+      if (natural > 0) box.style.fontSize = (100 * box.clientWidth / natural * 0.995).toFixed(2) + 'px';
     }
     fit();
 
     let rt;
     addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(fit, 120); });
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(box);
-    }
-    if (!RM) {
-      subs.push((now, dt) => {
-        if (!visible) return;
-        phase += dt * (0.0011 + S.energy * 0.006);
-        apply();
-      });
-    }
     return { fit };
   }
 
@@ -592,7 +560,7 @@
      Arranque
      ------------------------------------------------------------------ */
   const field = initField();
-  const kinetic = initKinetic();
+  const title = initTitle();
   const strike = initStrike();
   initScrollText();
   initReveal();
@@ -605,7 +573,7 @@
 
   const fontsReady = doc.fonts && doc.fonts.ready ? doc.fonts.ready : Promise.resolve();
   fontsReady.then(() => {
-    kinetic.fit();
+    title.fit();
     initFit();
     initMarquees();
   });
