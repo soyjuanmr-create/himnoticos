@@ -116,7 +116,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   text-transform: uppercase; letter-spacing: -.005em;
 }
 .h-xl { font-size: clamp(2.6rem, 8.4vw, 8.5rem); line-height: .86; }
-.h-xxl { font-size: clamp(3.2rem, 12.5vw, 13rem); line-height: .82; }
+/* 10.6vw: «¿Montamos el jaleo?» cabe en una línea desde tablet, y el formulario queda a la vista */
+.h-xxl { font-size: clamp(3.2rem, 10.6vw, 13rem); line-height: .82; }
 .h-xl .goth, .h-xxl .goth { font-size: 1.08em; line-height: .8; }
 
 /* ---------- Botones y enlaces ---------- */
@@ -696,6 +697,7 @@ html.is-locked { overflow: hidden; }
   clip-path: polygon(0 clamp(2rem, 6vw, 6rem), 100% 0, 100% 100%, 0 100%);
   color-scheme: light;
 }
+.contact > .wrap { scroll-margin-top: 5.5rem; }   /* destino de «Contratar»: aire bajo la cabecera */
 .contact ::selection { background: var(--bg); color: var(--orange); }
 .contact :focus-visible { outline-color: var(--bg); }
 .contact .label { color: rgba(10, 9, 8, .8); }

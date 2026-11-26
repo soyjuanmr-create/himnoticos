@@ -666,7 +666,9 @@
         en.target.classList.add('in');
         io.unobserve(en.target);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+      // umbral 0: basta con que asome. Con un porcentaje del elemento, uno muy alto (el formulario)
+      // podía quedarse invisible en pantallas bajas aunque ya estuviera en pantalla.
+    }, { threshold: 0, rootMargin: '0px 0px -6% 0px' });
     els.forEach(e => io.observe(e));
   }
 
