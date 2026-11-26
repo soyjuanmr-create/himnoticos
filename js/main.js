@@ -565,13 +565,37 @@
       measure();
       addEventListener('resize', measure);
 
-      let x = dir < 0 ? 0 : -unit;
+      // Con data-marquee-lead la cinta espera quieta, con su primer elemento alineado
+      // al margen, hasta que se ve bien en pantalla: así se lee primero ese elemento.
+      const lead = track.hasAttribute('data-marquee-lead');
+      const wrap = $('.wrap');
+      const inset = lead && wrap ? parseFloat(getComputedStyle(wrap).paddingLeft) || 0 : 0;
+      let x = dir < 0 ? inset : -unit;
       track.style.transform = `translate3d(${x}px,0,0)`;
       if (RM) return;
+
+      let running = !lead, seen = !lead, since = 0;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(es => {
+          const en = es[es.length - 1];
+          if (en.intersectionRatio >= 0.6) seen = true;
+          running = en.isIntersecting && seen;
+        }, { threshold: [0, 0.6] }).observe(track.parentElement);
+      } else {
+        running = true;
+      }
+
       subs.push((now, dt) => {
-        x += dir * (speed / 1000 + Math.abs(S.sv) * 0.5) * dt;
-        if (x <= -unit) x += unit;
-        if (x > 0) x -= unit;
+        if (!running) return;
+        let boost = Math.abs(S.sv) * 0.5;
+        if (lead) {
+          // al arrancar: un momento quieta y, durante unos segundos, sin el acelerón del scroll
+          if (!since) since = now;
+          if (now - since < 1200) return;
+          if (now - since < 6000) boost = 0;
+        }
+        x += dir * (speed / 1000 + boost) * dt;
+        if (dir < 0) { if (x <= -unit) x += unit; } else if (x > 0) x -= unit;
         const skew = clamp(S.sv * -7 * dir, -14, 14);
         track.style.transform = `translate3d(${x.toFixed(1)}px,0,0) skewX(${skew.toFixed(2)}deg)`;
       });
