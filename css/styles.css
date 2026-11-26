@@ -296,8 +296,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
     radial-gradient(40% 45% at 8% 100%, rgba(242, 110, 38, .1), transparent 70%);
 }
 .hero::after {
-  content: ""; position: absolute; inset: auto 0 0 0; height: 24%; z-index: -1;
-  background: linear-gradient(transparent, var(--bg));
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(10, 9, 8, .9), rgba(10, 9, 8, .8) 12%, transparent 25%),
+    linear-gradient(to bottom, transparent 76%, var(--bg));
 }
 .hero__field { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
 
@@ -468,8 +470,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   transition: transform .6s var(--ease);
 }
 .member__photo::after {
-  content: ""; position: absolute; inset: auto 0 0 0; height: 42%; pointer-events: none;
-  background: linear-gradient(transparent, rgba(10, 9, 8, .82));
+  content: ""; position: absolute; inset: auto 0 0 0; height: 48%; pointer-events: none;
+  background: linear-gradient(transparent, rgba(10, 9, 8, .72) 58%, rgba(10, 9, 8, .95));
 }
 .member__photo img {
   display: block; width: 100%; height: 100%;
@@ -696,7 +698,7 @@ html.is-locked { overflow: hidden; }
 }
 .contact ::selection { background: var(--bg); color: var(--orange); }
 .contact :focus-visible { outline-color: var(--bg); }
-.contact .label { color: rgba(10, 9, 8, .72); }
+.contact .label { color: rgba(10, 9, 8, .8); }
 .contact .label b, .contact .goth { color: var(--bg); }
 .contact .h-xxl { margin-top: clamp(1.2rem, 2.4vw, 2.4rem); }
 .contact .btn { --btn-bg: var(--bg); --btn-fg: var(--orange); --btn-hover: var(--cream); }
@@ -724,8 +726,8 @@ html.is-locked { overflow: hidden; }
 @supports (field-sizing: content) {
   .blank input { width: auto; min-width: 5ch; field-sizing: content; }
 }
-.blank input::placeholder { color: rgba(10, 9, 8, .5); opacity: 1; }
-.blank select:invalid { color: rgba(10, 9, 8, .5); }
+.blank input::placeholder { color: rgba(10, 9, 8, .7); opacity: 1; }
+.blank select:invalid { color: rgba(10, 9, 8, .7); }
 .blank input:hover, .blank select:hover,
 .blank input:focus, .blank select:focus { background-color: rgba(10, 9, 8, .1); outline: none; }
 .blank input:focus-visible, .blank select:focus-visible { outline: 3px solid var(--bg); outline-offset: 3px; }
@@ -746,7 +748,7 @@ html.is-locked { overflow: hidden; }
 
 .booking__more { display: block; margin-top: clamp(1.6rem, 3vw, 2.6rem); }
 .booking__more-label { display: block; margin-bottom: .6rem; font-weight: 700; }
-.booking__more small { font-size: 1em; font-weight: 500; opacity: .7; }
+.booking__more small { font-size: 1em; font-weight: 500; opacity: .8; }
 .booking__more textarea {
   display: block; width: 100%; min-height: 7rem; resize: vertical;
   padding: .9rem 1rem;
@@ -850,7 +852,11 @@ html.is-locked { overflow: hidden; }
   .brand__name { font-size: 1.4rem; }
 
   .hero { padding-top: 4.6rem; }
-  .hero::after { height: 54%; background: linear-gradient(transparent, rgba(10, 9, 8, .88) 60%, var(--bg)); }
+  .hero::after {
+    background:
+      linear-gradient(to bottom, rgba(10, 9, 8, .9), rgba(10, 9, 8, .8) 12%, transparent 24%),
+      linear-gradient(to bottom, transparent 46%, rgba(10, 9, 8, .88) 78%, var(--bg));
+  }
   .hero__meta { font-size: .62rem; letter-spacing: .18em; }
   .hero__name { font-stretch: 68%; font-size: 17.6vw; transform: scaleY(1.2); transform-origin: bottom; }
   .hero__los { margin-bottom: .34em; }
