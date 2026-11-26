@@ -10,7 +10,13 @@
   <meta property="og:title" content="Los Himnóticos · Jaleo Band">
   <meta property="og:description" content="Rock and roll en directo para festivales, eventos y fiestas que no se quieren acabar.">
   <meta property="og:locale" content="es_ES">
+  <!-- Al tener dominio: poner aquí la URL absoluta de la imagen y añadir og:url -->
+  <meta property="og:image" content="assets/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/pirata-one.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/styles.css">
@@ -33,6 +39,9 @@
   <svg class="sprite" aria-hidden="true" focusable="false">
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M14.5 1 3.5 14h6.2L7.5 23 20.5 9.4h-6.4z"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 19 19 5M8 5h11v11" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
     <!-- Rayo del logo simplificado a tres rayas para tamaños pequeños -->
     <symbol id="logo-bolt-mini" viewBox="80 0 700 900">
       <g fill="none" stroke="currentColor" stroke-linejoin="miter" stroke-miterlimit="8">
@@ -64,8 +73,8 @@
       <span class="brand__name goth">Los Himnóticos</span>
     </a>
     <nav class="nav" aria-label="Principal">
-      <a href="#manifiesto">Manifiesto</a>
       <a href="#banda">La banda</a>
+      <a href="#directo">En directo</a>
       <a href="#bolos">Bolos</a>
       <a href="#escenarios">Escenarios</a>
     </nav>
@@ -180,10 +189,48 @@
       </ul>
     </section>
 
+    <!-- EN DIRECTO -->
+    <section class="live wrap" id="directo">
+      <header class="live__head">
+        <p class="label" data-reveal><b>03</b> En directo</p>
+        <h2 class="h-xl" data-reveal>Míralos <em class="goth">en directo.</em></h2>
+      </header>
+      <ul class="live__list" data-reveal>
+        <li class="clip" style="--i:0">
+          <a class="clip__link" href="https://www.instagram.com/reel/DePd9joRGf-/" target="_blank" rel="noopener" data-reel="DePd9joRGf-">
+            <img src="assets/img/videos/reel-1.webp" width="720" height="1280" alt="Los Himnóticos ante el público de un festival, a pleno sol" loading="lazy" decoding="async">
+            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
+            <span class="clip__cap"><span class="clip__n" aria-hidden="true">01</span><span class="clip__t goth">Festival</span></span>
+            <span class="sr-only">Reproducir vídeo</span>
+          </a>
+        </li>
+        <li class="clip" style="--i:1">
+          <a class="clip__link" href="https://www.instagram.com/reel/DgDKlr4N8sY/" target="_blank" rel="noopener" data-reel="DgDKlr4N8sY">
+            <img src="assets/img/videos/reel-2.webp" width="720" height="1280" alt="Joe con el puño en alto en el Tardeo Canalla" loading="lazy" decoding="async">
+            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
+            <span class="clip__cap"><span class="clip__n" aria-hidden="true">02</span><span class="clip__t goth">Tardeo Canalla</span></span>
+            <span class="sr-only">Reproducir vídeo</span>
+          </a>
+        </li>
+        <li class="clip" style="--i:2">
+          <a class="clip__link" href="https://www.instagram.com/reel/DejRErRRK0C/" target="_blank" rel="noopener" data-reel="DejRErRRK0C">
+            <img src="assets/img/videos/reel-3.webp" width="720" height="1280" alt="Joe cantando entre el público con las manos en alto" loading="lazy" decoding="async">
+            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
+            <span class="clip__cap"><span class="clip__n" aria-hidden="true">03</span><span class="clip__t goth">Entre el público</span></span>
+            <span class="sr-only">Reproducir vídeo</span>
+          </a>
+        </li>
+        <li class="live__more" style="--i:3">
+          <a class="link" href="https://www.instagram.com/himnoticos" target="_blank" rel="noopener">Más vídeos en Instagram <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <p class="live__note">Los vídeos se cargan desde Instagram al pulsar reproducir.</p>
+        </li>
+      </ul>
+    </section>
+
     <!-- BOLOS -->
     <section class="formats wrap" id="bolos">
       <header class="formats__head">
-        <p class="label" data-reveal><b>03</b> Bolos</p>
+        <p class="label" data-reveal><b>04</b> Bolos</p>
         <h2 class="h-xl" data-reveal>Tú di dónde. <em class="goth">Nosotros vamos.</em></h2>
       </header>
       <ul class="formats__list">
@@ -212,12 +259,25 @@
           </a>
         </li>
       </ul>
+
+      <!-- Dossier para promotores. Para activarlo: subir el PDF a assets/docs/dossier-los-himnoticos.pdf
+           y quitar el atributo hidden de este bloque. -->
+      <aside class="dossier" hidden>
+        <div>
+          <p class="dossier__t">¿Programas un festival o una sala?</p>
+          <p class="dossier__d">Bio, fotos en alta y rider técnico, en un solo PDF.</p>
+        </div>
+        <a class="btn" href="assets/docs/dossier-los-himnoticos.pdf" download data-magnetic>
+          <span class="btn__label">Descargar dossier</span>
+          <svg class="i" aria-hidden="true"><use href="#i-down"/></svg>
+        </a>
+      </aside>
     </section>
 
     <!-- ESCENARIOS -->
     <section class="stages" id="escenarios">
       <div class="wrap">
-        <p class="label" data-reveal><b>04</b> Escenarios</p>
+        <p class="label" data-reveal><b>05</b> Escenarios</p>
         <p class="stages__lead" data-reveal>Ya ha habido jaleo en</p>
       </div>
       <ul class="sr-only">
@@ -241,8 +301,18 @@
     <!-- CONTRATACIÓN -->
     <section class="contact" id="contratacion">
       <div class="wrap">
-        <p class="label" data-reveal><b>05</b> Contratación</p>
+        <p class="label" data-reveal><b>06</b> Contratación</p>
         <h2 class="h-xxl" data-reveal>¿Montamos <em class="goth">el jaleo?</em></h2>
+
+        <!-- WhatsApp. Para activarlo: poner el número real en el enlace (prefijo 34, sin + ni espacios)
+             y quitar el atributo hidden de este párrafo. -->
+        <p class="contact__fast" hidden>
+          <span>¿Con prisa?</span>
+          <a class="btn btn--line" href="https://wa.me/34000000000?text=Hola%2C%20quiero%20informaci%C3%B3n%20para%20contratar%20a%20Los%20Himn%C3%B3ticos." target="_blank" rel="noopener">
+            <svg class="i" aria-hidden="true"><use href="#i-chat"/></svg>
+            <span class="btn__label">Escríbenos por WhatsApp</span>
+          </a>
+        </p>
 
         <form class="booking" id="booking" action="https://formspree.io/f/REEMPLAZAR" method="POST" data-reveal>
           <p class="booking__line">
@@ -278,6 +348,11 @@
           <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
           <input type="hidden" name="_subject" value="Nueva solicitud de contratación (web)">
 
+          <label class="consent">
+            <input type="checkbox" name="privacidad" value="aceptada" required>
+            <span>He leído y acepto la <a href="legal.html#privacidad" target="_blank" rel="noopener">política de privacidad</a>.</span>
+          </label>
+
           <div class="booking__send">
             <button class="btn btn--xl" type="submit" data-magnetic>
               <span class="btn__label">Enviar solicitud</span>
@@ -300,10 +375,20 @@
     <div class="foot__word" aria-hidden="true"><span data-fit>LOS HIMNÓTICOS</span></div>
     <div class="foot__row wrap">
       <p>© <span data-year>2026</span> Los Himnóticos · Jaleo Band</p>
+      <a class="link" href="legal.html">Aviso legal y privacidad</a>
       <a class="link" href="https://www.instagram.com/himnoticos" target="_blank" rel="noopener">Instagram <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       <a class="link" href="#inicio">Arriba <span aria-hidden="true">↑</span></a>
     </div>
   </footer>
+
+  <!-- Reproductor de vídeo: el contenido de Instagram solo se carga al abrirlo -->
+  <div class="modal" id="reel-modal" role="dialog" aria-modal="true" aria-label="Vídeo en directo" hidden>
+    <div class="modal__box">
+      <button class="modal__close" type="button" aria-label="Cerrar vídeo">×</button>
+      <div class="modal__frame"></div>
+      <a class="link modal__out" href="https://www.instagram.com/himnoticos" target="_blank" rel="noopener">Abrir en Instagram <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+  </div>
 
   <script src="js/main.js" defer></script>
 </body>

@@ -539,7 +539,7 @@
 
     addEventListener('click', e => {
       if (e.detail === 0) return;                                  // clic de teclado
-      if (e.target.closest('input, select, textarea, label')) return;
+      if (e.target.closest('input, select, textarea, label, [data-reel], .modal')) return;
       hit(e.clientX, e.clientY);
     });
 
@@ -715,21 +715,73 @@
   }
 
   /* ------------------------------------------------------------------
-     La banda: en táctil no hay hover, así que recupera el color la
-     tarjeta centrada en el carrusel (o la que se toque)
+     Carruseles (la banda, los vídeos): en táctil no hay hover, así que
+     recupera el color la tarjeta centrada (o, en la banda, la que se toque)
      ------------------------------------------------------------------ */
-  function initBand() {
-    const list = $('.band__list');
-    if (!list || FINE) return;
-    const cards = $$('.member', list);
-    const setActive = el => cards.forEach(c => c.classList.toggle('is-active', c === el));
-    cards.forEach(c => c.addEventListener('click', () => setActive(c.classList.contains('is-active') ? null : c)));
-    if (!('IntersectionObserver' in window)) return;
-    const io = new IntersectionObserver(entries => {
-      if (list.scrollWidth <= list.clientWidth + 4) return;   // sin carrusel no hay tarjeta "centrada"
-      entries.forEach(en => { if (en.isIntersecting) setActive(en.target); });
-    }, { root: list, rootMargin: '0px -40% 0px -40%', threshold: 0 });
-    cards.forEach(c => io.observe(c));
+  function initSwipeColor() {
+    if (FINE) return;
+    [['.band__list', '.member', true], ['.live__list', '.clip', false]].forEach(([listSel, itemSel, tap]) => {
+      const list = $(listSel);
+      if (!list) return;
+      const cards = $$(itemSel, list);
+      const setActive = el => cards.forEach(c => c.classList.toggle('is-active', c === el));
+      if (tap) cards.forEach(c => c.addEventListener('click', () => setActive(c.classList.contains('is-active') ? null : c)));
+      if (!('IntersectionObserver' in window)) return;
+      const io = new IntersectionObserver(entries => {
+        if (list.scrollWidth <= list.clientWidth + 4) return;   // sin carrusel no hay tarjeta "centrada"
+        entries.forEach(en => { if (en.isIntersecting) setActive(en.target); });
+      }, { root: list, rootMargin: '0px -40% 0px -40%', threshold: 0 });
+      cards.forEach(c => io.observe(c));
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     En directo: el reproductor de Instagram solo se carga al pulsar.
+     Sin este script, cada tarjeta es un enlace normal al vídeo.
+     ------------------------------------------------------------------ */
+  function initLive() {
+    const modal = $('#reel-modal');
+    const links = $$('[data-reel]');
+    if (!modal || !links.length) return;
+    const frame = $('.modal__frame', modal);
+    const out = $('.modal__out', modal);
+    const closeBtn = $('.modal__close', modal);
+    let opener = null;
+
+    function close() {
+      if (modal.hidden) return;
+      modal.hidden = true;
+      frame.textContent = '';                 // al quitar el iframe se detiene el vídeo
+      root.classList.remove('is-locked');
+      if (opener) opener.focus({ preventScroll: true });
+    }
+
+    function open(link) {
+      opener = link;
+      const f = doc.createElement('iframe');
+      f.src = `https://www.instagram.com/reel/${encodeURIComponent(link.dataset.reel)}/embed/`;
+      f.title = 'Vídeo de Los Himnóticos en Instagram';
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; clipboard-write; web-share';
+      f.allowFullscreen = true;
+      f.setAttribute('scrolling', 'no');
+      frame.textContent = '';
+      frame.appendChild(f);
+      out.href = link.href;
+      modal.hidden = false;
+      root.classList.add('is-locked');
+      closeBtn.focus({ preventScroll: true });
+    }
+
+    links.forEach(a => a.addEventListener('click', e => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;   // abrir en pestaña nueva sigue funcionando
+      e.preventDefault();
+      open(a);
+    }));
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    // el foco no sale de la ventana mientras está abierta
+    doc.addEventListener('focusin', e => { if (!modal.hidden && !modal.contains(e.target)) closeBtn.focus(); });
   }
 
   /* ------------------------------------------------------------------
@@ -784,7 +836,7 @@
       if (!form.checkValidity()) {
         const bad = form.querySelector(':invalid');
         if (bad) bad.focus();
-        say('Nos falta algo: tu nombre, el tipo de evento y un correo válido.', 'error');
+        say('Nos falta algo: tu nombre, el tipo de evento, un correo válido y aceptar la política de privacidad.', 'error');
         return;
       }
       if (form.elements._gotcha.value) return;   // trampa antispam
@@ -891,7 +943,8 @@
   initMagnetic();
   initSpot();
   initHeader();
-  initBand();
+  initSwipeColor();
+  initLive();
   initRows();
   initForm(strike);
   $$('[data-year]').forEach(n => { n.textContent = new Date().getFullYear(); });
