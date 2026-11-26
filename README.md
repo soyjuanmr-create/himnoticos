@@ -7,6 +7,7 @@ Home de la banda con formulario de contratación. Sitio estático: HTML, CSS y J
 ```
 index.html            contenido de la home
 legal.html            aviso legal, política de privacidad y cookies
+sitemap.xml           mapa del sitio para buscadores
 css/styles.css        estilos
 js/main.js            animaciones e interacciones
 assets/fonts/         tipografías autoalojadas (Archivo y Pirata One, licencia SIL OFL)
@@ -59,9 +60,15 @@ El botón «Escríbenos por WhatsApp» de la sección de contratación apunta a 
 
 `index.html` lleva también `<meta name="robots" content="noindex">` para que Google no indexe la web mientras tenga datos de muestra. Quitar esa línea al lanzar.
 
+Después de quitarla, dar de alta la web en [Google Search Console](https://search.google.com/search-console) y enviar ahí la dirección de `sitemap.xml`. Poner el enlace de la web en la bio de Instagram también ayuda a que Google la encuentre.
+
 ### 5. Dominio propio
 
-Las etiquetas `og:url` y `og:image` del `<head>` de `index.html` apuntan a la dirección de GitHub Pages. Si la web pasa a un dominio propio, cambiar ahí la dirección.
+La dirección de GitHub Pages (`https://soyjuanmr-create.github.io/himnoticos/`) aparece en cuatro sitios. Si la web pasa a un dominio propio, cambiarla en todos:
+
+- en el `<head>` de `index.html`: `canonical`, `og:url` y `og:image`;
+- en el mismo `<head>`, dentro de los datos estructurados (`url`, `image` y `logo`);
+- en `sitemap.xml`.
 
 ## Vídeos
 
