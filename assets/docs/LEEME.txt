@@ -1,5 +1,3 @@
-Aquí va el dossier para promotores, con este nombre exacto:
+dossier-los-himnoticos.pdf es un documento DE MUESTRA.
 
-    dossier-los-himnoticos.pdf
-
-Después, en index.html, quitar el atributo hidden del bloque <aside class="dossier">.
+Para poner el definitivo, sustituirlo por otro PDF con ese mismo nombre.

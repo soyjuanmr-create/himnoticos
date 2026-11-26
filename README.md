@@ -22,50 +22,46 @@ python3 -m http.server 8000
 
 Y abrir `http://localhost:8000`.
 
-## Pendiente antes de publicar
+## Publicar
 
-Estas piezas están montadas pero necesitan un dato que solo tiene la banda.
+Pensado para GitHub Pages. En el repositorio de GitHub:
 
-### 1. Formulario
+1. *Settings → General → Danger Zone → Change repository visibility → Make public* (el plan gratuito solo publica repositorios públicos).
+2. *Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / `(root)` → Save*.
 
-El formulario envía a [Formspree](https://formspree.io). Hay que crear un formulario allí con el correo donde se quieren recibir las solicitudes y pegar su identificador en el atributo `action` del `<form id="booking">` de `index.html`, sustituyendo `REEMPLAZAR`:
+En un par de minutos queda en `https://soyjuanmr-create.github.io/himnoticos/`.
 
-```html
-<form ... action="https://formspree.io/f/abcdwxyz" method="POST">
-```
+## Formulario
 
-Mientras siga el valor `REEMPLAZAR`, el formulario avisa de que todavía no está conectado y no envía nada.
+El formulario envía a través de [FormSubmit](https://formsubmit.co), que reenvía cada solicitud a `himnoticos@gmail.com` sin necesidad de crear una cuenta.
 
-### 2. WhatsApp
+**Activación (una sola vez):** con la web ya publicada, hay que enviar el formulario una primera vez. FormSubmit manda entonces a `himnoticos@gmail.com` un correo con un enlace «Activate Form»; al pulsarlo, el formulario queda activo. Hasta entonces, quien lo envíe verá un aviso de que está pendiente de activar.
 
-El botón «Escríbenos por WhatsApp» está en la sección de contratación, oculto. Para activarlo, en `index.html`, dentro de `<p class="contact__fast" hidden>`:
+Ese mismo correo trae un código alternativo. Conviene sustituir con él la dirección en el atributo `action` del `<form id="booking">` de `index.html` (`https://formsubmit.co/CÓDIGO`), para que el correo no quede visible en el código de la página.
 
-- cambiar `34000000000` por el número real (prefijo 34, sin `+` ni espacios);
-- quitar el atributo `hidden`.
+## Pendiente antes del lanzamiento definitivo
 
-Y en `legal.html`, dejar las frases sobre WhatsApp que ahora están marcadas entre corchetes.
+Lo siguiente está visible con datos de muestra, para ver cómo queda.
+
+### 1. WhatsApp
+
+El botón «Escríbenos por WhatsApp» de la sección de contratación apunta a `34000000000`, un número que no existe (a propósito, para que nadie acabe escribiendo a un desconocido). En `index.html`, dentro de `<p class="contact__fast">`, cambiarlo por el real: prefijo 34, sin `+` ni espacios.
+
+### 2. Dossier para promotores
+
+`assets/docs/dossier-los-himnoticos.pdf` es un documento de muestra, marcado como tal en todas sus páginas. Para poner el definitivo, sustituirlo por otro PDF con ese mismo nombre.
 
 ### 3. Textos legales
 
-`legal.html` es un borrador. Lo que falta está resaltado entre corchetes: titular, NIF, domicilio, correo, fecha y dos puntos que debe revisar alguien con criterio legal (jurisdicción y garantías de la transferencia internacional de Formspree). Al completarlo, quitar la línea `<meta name="robots" content="noindex">`.
+`legal.html` es un borrador. Lo que falta está resaltado entre corchetes: titular, NIF, domicilio, fecha y dos puntos que debe revisar alguien con criterio legal (jurisdicción y dónde trata los datos el servicio del formulario). Al completarlo, quitar de `legal.html` la línea `<meta name="robots" content="noindex">`.
 
-### 4. Dossier para promotores
+### 4. Indexación en buscadores
 
-El bloque «¿Programas un festival o una sala?» está al final de la sección de bolos, oculto. Para activarlo:
+`index.html` lleva también `<meta name="robots" content="noindex">` para que Google no indexe la web mientras tenga datos de muestra. Quitar esa línea al lanzar.
 
-- subir el PDF a `assets/docs/dossier-los-himnoticos.pdf` (con ese nombre exacto);
-- en `index.html`, quitar el atributo `hidden` de `<aside class="dossier" hidden>`.
+### 5. Dominio propio
 
-### 5. Dominio
-
-Al tener la dirección definitiva, en el `<head>` de `index.html`:
-
-- poner la URL absoluta de la imagen en `og:image` (por ejemplo `https://dominio.com/assets/img/og.jpg`); con una ruta relativa, WhatsApp e Instagram no muestran la imagen al compartir el enlace;
-- añadir `<meta property="og:url" content="https://dominio.com/">`.
-
-## Publicar
-
-Pensado para GitHub Pages: en el repositorio, *Settings → Pages → Deploy from a branch → main / (root)*. En el plan gratuito de GitHub el repositorio tiene que ser público.
+Las etiquetas `og:url` y `og:image` del `<head>` de `index.html` apuntan a la dirección de GitHub Pages. Si la web pasa a un dominio propio, cambiar ahí la dirección.
 
 ## Vídeos
 

@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Los Himnóticos · Jaleo Band · Contratación</title>
   <meta name="description" content="Los Himnóticos, Jaleo Band. Rock and roll en directo para festivales, eventos de empresa y fiestas privadas. Pide fecha y presupuesto.">
+  <!-- PROVISIONAL: sin indexar mientras el WhatsApp y el dossier sean de muestra. Quitar al lanzar. -->
+  <meta name="robots" content="noindex">
   <meta name="theme-color" content="#0a0908">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Los Himnóticos · Jaleo Band">
   <meta property="og:description" content="Rock and roll en directo para festivales, eventos y fiestas que no se quieren acabar.">
   <meta property="og:locale" content="es_ES">
-  <!-- Al tener dominio: poner aquí la URL absoluta de la imagen y añadir og:url -->
-  <meta property="og:image" content="assets/img/og.jpg">
+  <!-- Dirección de GitHub Pages. Si se pasa a un dominio propio, cambiarla en estas dos líneas. -->
+  <meta property="og:url" content="https://soyjuanmr-create.github.io/himnoticos/">
+  <meta property="og:image" content="https://soyjuanmr-create.github.io/himnoticos/assets/img/og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
@@ -40,7 +43,7 @@
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M14.5 1 3.5 14h6.2L7.5 23 20.5 9.4h-6.4z"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 19 19 5M8 5h11v11" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol>
-    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
     <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
     <!-- Rayo del logo simplificado a tres rayas para tamaños pequeños -->
     <symbol id="logo-bolt-mini" viewBox="80 0 700 900">
@@ -260,9 +263,9 @@
         </li>
       </ul>
 
-      <!-- Dossier para promotores. Para activarlo: subir el PDF a assets/docs/dossier-los-himnoticos.pdf
-           y quitar el atributo hidden de este bloque. -->
-      <aside class="dossier" hidden>
+      <!-- Dossier para promotores. EL PDF ES DE MUESTRA: sustituirlo por el definitivo con el mismo nombre
+           (assets/docs/dossier-los-himnoticos.pdf). -->
+      <aside class="dossier" data-reveal>
         <div>
           <p class="dossier__t">¿Programas un festival o una sala?</p>
           <p class="dossier__d">Bio, fotos en alta y rider técnico, en un solo PDF.</p>
@@ -304,9 +307,9 @@
         <p class="label" data-reveal><b>06</b> Contratación</p>
         <h2 class="h-xxl" data-reveal>¿Montamos <em class="goth">el jaleo?</em></h2>
 
-        <!-- WhatsApp. Para activarlo: poner el número real en el enlace (prefijo 34, sin + ni espacios)
-             y quitar el atributo hidden de este párrafo. -->
-        <p class="contact__fast" hidden>
+        <!-- WhatsApp. NÚMERO DE MUESTRA: 34000000000 no existe, para que nadie escriba a un desconocido.
+             Cambiarlo por el real (prefijo 34, sin + ni espacios). -->
+        <p class="contact__fast" data-reveal>
           <span>¿Con prisa?</span>
           <a class="btn btn--line" href="https://wa.me/34000000000?text=Hola%2C%20quiero%20informaci%C3%B3n%20para%20contratar%20a%20Los%20Himn%C3%B3ticos." target="_blank" rel="noopener">
             <svg class="i" aria-hidden="true"><use href="#i-chat"/></svg>
@@ -314,7 +317,7 @@
           </a>
         </p>
 
-        <form class="booking" id="booking" action="https://formspree.io/f/REEMPLAZAR" method="POST" data-reveal>
+        <form class="booking" id="booking" action="https://formsubmit.co/himnoticos@gmail.com" method="POST" data-reveal>
           <p class="booking__line">
             Hola, soy
             <label class="blank"><span class="sr-only">Tu nombre</span><input type="text" name="nombre" placeholder="tu nombre" autocomplete="name" required></label>
@@ -345,8 +348,9 @@
             <textarea name="mensaje" rows="3"></textarea>
           </label>
 
-          <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
           <input type="hidden" name="_subject" value="Nueva solicitud de contratación (web)">
+          <input type="hidden" name="_template" value="table">
 
           <label class="consent">
             <input type="checkbox" name="privacidad" value="aceptada" required>

@@ -839,7 +839,7 @@
         say('Nos falta algo: tu nombre, el tipo de evento, un correo válido y aceptar la política de privacidad.', 'error');
         return;
       }
-      if (form.elements._gotcha.value) return;   // trampa antispam
+      if (form.elements._honey.value) return;   // trampa antispam
 
       const action = form.getAttribute('action') || '';
       if (/REEMPLAZAR/.test(action)) {
@@ -851,8 +851,23 @@
       form.classList.add('is-sending');
       say('Enviando…');
       try {
-        const res = await fetch(action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        // FormSubmit: su variante /ajax/ responde en JSON, sin salir de la página
+        const url = action.replace('formsubmit.co/', 'formsubmit.co/ajax/').replace('/ajax/ajax/', '/ajax/');
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form)))
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || String(json.success) !== 'true') {
+          if (/activat/i.test(json.message || '')) {
+            // primer envío: el servicio manda a la banda un correo para activar el formulario
+            say('El formulario está pendiente de activar. Mientras tanto, escríbenos por Instagram: @himnoticos', 'error');
+            btn.disabled = false;
+            return;
+          }
+          throw new Error(json.message || 'HTTP ' + res.status);
+        }
         form.hidden = true;
         done.hidden = false;
         done.focus({ preventScroll: true });
