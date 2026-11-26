@@ -25,7 +25,8 @@
   <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/pirata-one.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/styles.css">
-  <script>document.documentElement.classList.add('js')</script>
+  <!-- La intro se ve una vez por sesión: en las siguientes cargas la página entra directamente -->
+  <script>(function (d) { d.classList.add('js'); try { if (sessionStorage.getItem('himnoticos-intro')) d.classList.add('no-intro'); } catch (e) {} })(document.documentElement);</script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -94,8 +95,8 @@
       <span class="brand__name goth">Los Himnóticos</span>
     </a>
     <nav class="nav" aria-label="Principal">
-      <a href="#banda">La banda</a>
       <a href="#directo">En directo</a>
+      <a href="#banda">La banda</a>
       <a href="#bolos">Bolos</a>
       <a href="#escenarios">Escenarios</a>
     </nav>
@@ -121,7 +122,10 @@
       </h1>
 
       <div class="hero__foot">
-        <p class="hero__sub" data-in style="--d:1s">Rock and roll en directo para festivales, eventos y fiestas que no se quieren acabar.</p>
+        <div class="hero__lede">
+          <p class="hero__sub" data-in style="--d:1s">Rock and roll en directo: los himnos de siempre para festivales, eventos y fiestas que no se quieren acabar.</p>
+          <p class="hero__proof" data-in style="--d:1.2s"><span>Ya ha habido jaleo en</span> <strong>Roig Arena · Love to Rock · Hard Rock Cafe</strong></p>
+        </div>
         <div class="hero__cta" data-in style="--d:1.1s">
           <a class="btn" href="#contratacion" data-magnetic>
             <span class="btn__label">Contrátanos</span>
@@ -170,10 +174,48 @@
       </div>
     </section>
 
+    <!-- EN DIRECTO -->
+    <section class="live wrap" id="directo">
+      <header class="live__head">
+        <p class="label" data-reveal><b>02</b> En directo</p>
+        <h2 class="h-xl" data-reveal>Míralos <em class="goth">en directo.</em></h2>
+      </header>
+      <ul class="live__list" data-reveal>
+        <li class="clip" style="--i:0">
+          <a class="clip__link" href="https://www.instagram.com/reel/DePd9joRGf-/" target="_blank" rel="noopener" data-reel="DePd9joRGf-">
+            <img src="assets/img/videos/reel-1.webp" width="720" height="1280" alt="Los Himnóticos ante el público de un festival, a pleno sol" loading="lazy" decoding="async">
+            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
+            <span class="clip__cap"><span class="clip__n" aria-hidden="true">01</span><span class="clip__t goth">Festival</span></span>
+            <span class="sr-only">Reproducir vídeo</span>
+          </a>
+        </li>
+        <li class="clip" style="--i:1">
+          <a class="clip__link" href="https://www.instagram.com/reel/DgDKlr4N8sY/" target="_blank" rel="noopener" data-reel="DgDKlr4N8sY">
+            <img src="assets/img/videos/reel-2.webp" width="720" height="1280" alt="Joe con el puño en alto en el Tardeo Canalla" loading="lazy" decoding="async">
+            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
+            <span class="clip__cap"><span class="clip__n" aria-hidden="true">02</span><span class="clip__t goth">Tardeo Canalla</span></span>
+            <span class="sr-only">Reproducir vídeo</span>
+          </a>
+        </li>
+        <li class="clip" style="--i:2">
+          <a class="clip__link" href="https://www.instagram.com/reel/DejRErRRK0C/" target="_blank" rel="noopener" data-reel="DejRErRRK0C">
+            <img src="assets/img/videos/reel-3.webp" width="720" height="1280" alt="Joe cantando entre el público con las manos en alto" loading="lazy" decoding="async">
+            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
+            <span class="clip__cap"><span class="clip__n" aria-hidden="true">03</span><span class="clip__t goth">Entre el público</span></span>
+            <span class="sr-only">Reproducir vídeo</span>
+          </a>
+        </li>
+        <li class="live__more" style="--i:3">
+          <a class="link" href="https://www.instagram.com/himnoticos" target="_blank" rel="noopener">Más vídeos en Instagram <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <p class="live__note">Los vídeos se cargan desde Instagram al pulsar reproducir.</p>
+        </li>
+      </ul>
+    </section>
+
     <!-- LA BANDA -->
     <section class="band wrap" id="banda">
       <header class="band__head">
-        <p class="label" data-reveal><b>02</b> La banda</p>
+        <p class="label" data-reveal><b>03</b> La banda</p>
         <h2 class="h-xl" data-reveal>Los <em class="goth">culpables.</em></h2>
       </header>
       <ul class="band__list" data-reveal>
@@ -206,44 +248,6 @@
             <div class="member__photo"><img src="assets/img/banda/roi.webp" width="626" height="854" alt="Roi tocando la guitarra en pleno concierto" loading="lazy" decoding="async" style="--pos:45% 50%"></div>
             <figcaption><span class="member__name goth">Roi</span><span class="member__role">Guitarra</span></figcaption>
           </figure>
-        </li>
-      </ul>
-    </section>
-
-    <!-- EN DIRECTO -->
-    <section class="live wrap" id="directo">
-      <header class="live__head">
-        <p class="label" data-reveal><b>03</b> En directo</p>
-        <h2 class="h-xl" data-reveal>Míralos <em class="goth">en directo.</em></h2>
-      </header>
-      <ul class="live__list" data-reveal>
-        <li class="clip" style="--i:0">
-          <a class="clip__link" href="https://www.instagram.com/reel/DePd9joRGf-/" target="_blank" rel="noopener" data-reel="DePd9joRGf-">
-            <img src="assets/img/videos/reel-1.webp" width="720" height="1280" alt="Los Himnóticos ante el público de un festival, a pleno sol" loading="lazy" decoding="async">
-            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
-            <span class="clip__cap"><span class="clip__n" aria-hidden="true">01</span><span class="clip__t goth">Festival</span></span>
-            <span class="sr-only">Reproducir vídeo</span>
-          </a>
-        </li>
-        <li class="clip" style="--i:1">
-          <a class="clip__link" href="https://www.instagram.com/reel/DgDKlr4N8sY/" target="_blank" rel="noopener" data-reel="DgDKlr4N8sY">
-            <img src="assets/img/videos/reel-2.webp" width="720" height="1280" alt="Joe con el puño en alto en el Tardeo Canalla" loading="lazy" decoding="async">
-            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
-            <span class="clip__cap"><span class="clip__n" aria-hidden="true">02</span><span class="clip__t goth">Tardeo Canalla</span></span>
-            <span class="sr-only">Reproducir vídeo</span>
-          </a>
-        </li>
-        <li class="clip" style="--i:2">
-          <a class="clip__link" href="https://www.instagram.com/reel/DejRErRRK0C/" target="_blank" rel="noopener" data-reel="DejRErRRK0C">
-            <img src="assets/img/videos/reel-3.webp" width="720" height="1280" alt="Joe cantando entre el público con las manos en alto" loading="lazy" decoding="async">
-            <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
-            <span class="clip__cap"><span class="clip__n" aria-hidden="true">03</span><span class="clip__t goth">Entre el público</span></span>
-            <span class="sr-only">Reproducir vídeo</span>
-          </a>
-        </li>
-        <li class="live__more" style="--i:3">
-          <a class="link" href="https://www.instagram.com/himnoticos" target="_blank" rel="noopener">Más vídeos en Instagram <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <p class="live__note">Los vídeos se cargan desde Instagram al pulsar reproducir.</p>
         </li>
       </ul>
     </section>
@@ -299,7 +303,11 @@
     <section class="stages" id="escenarios">
       <div class="wrap">
         <p class="label" data-reveal><b>05</b> Escenarios</p>
-        <p class="stages__lead" data-reveal>Ya ha habido jaleo en</p>
+        <div class="stages__top" data-reveal>
+          <p class="stages__lead">Ya ha habido jaleo en</p>
+          <!-- Solo aparece cuando el rótulo se mueve (lo activa el script) -->
+          <button class="link stages__pause" type="button" data-marquee-toggle hidden><span data-label>Pausar</span><span class="sr-only"> el rótulo en movimiento</span></button>
+        </div>
       </div>
       <ul class="sr-only">
         <li>Roig Arena</li>
@@ -362,6 +370,7 @@
             o llamadme al
             <label class="blank"><span class="sr-only">Tu teléfono</span><input type="tel" name="telefono" placeholder="tu teléfono" autocomplete="tel"></label><span class="dot">.</span>
           </p>
+          <p class="booking__hint">Nos basta con tu nombre, el tipo de evento y un correo o un teléfono. La fecha y el lugar, si ya los sabes.</p>
 
           <label class="booking__more">
             <span class="booking__more-label">¿Algo más? Horario, invitados, si hay escenario… <small>(opcional)</small></span>

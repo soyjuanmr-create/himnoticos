@@ -38,6 +38,8 @@ El formulario envía a través de [FormSubmit](https://formsubmit.co), que reenv
 
 **Activación (una sola vez):** con la web ya publicada, hay que enviar el formulario una primera vez. FormSubmit manda entonces a `himnoticos@gmail.com` un correo con un enlace «Activate Form»; al pulsarlo, el formulario queda activo. Hasta entonces, quien lo envíe verá un aviso de que está pendiente de activar.
 
+Para enviar basta con el nombre, el tipo de evento y un correo o un teléfono; los avisos de error salen junto al campo que falla.
+
 Ese mismo correo trae un código alternativo. Conviene sustituir con él la dirección en el atributo `action` del `<form id="booking">` de `index.html` (`https://formsubmit.co/CÓDIGO`), para que el correo no quede visible en el código de la página.
 
 ## Pendiente antes del lanzamiento definitivo
@@ -79,3 +81,5 @@ Para cambiar un vídeo: en `index.html`, sustituir el identificador del reel (en
 ## Accesibilidad y movimiento
 
 Con la opción del sistema «reducir movimiento» activada, la web se muestra sin intro, sin rayos y con el fondo estático.
+
+La intro solo se ve en la primera carga de cada sesión del navegador; en las siguientes, la página entra directamente. El rótulo de escenarios se puede parar con su botón «Pausar» o, con ratón, dejando el puntero encima.
