@@ -454,6 +454,24 @@
   }
 
   /* ------------------------------------------------------------------
+     La banda: en táctil no hay hover, así que recupera el color la
+     tarjeta centrada en el carrusel (o la que se toque)
+     ------------------------------------------------------------------ */
+  function initBand() {
+    const list = $('.band__list');
+    if (!list || FINE) return;
+    const cards = $$('.member', list);
+    const setActive = el => cards.forEach(c => c.classList.toggle('is-active', c === el));
+    cards.forEach(c => c.addEventListener('click', () => setActive(c.classList.contains('is-active') ? null : c)));
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(entries => {
+      if (list.scrollWidth <= list.clientWidth + 4) return;   // sin carrusel no hay tarjeta "centrada"
+      entries.forEach(en => { if (en.isIntersecting) setActive(en.target); });
+    }, { root: list, rootMargin: '0px -40% 0px -40%', threshold: 0 });
+    cards.forEach(c => io.observe(c));
+  }
+
+  /* ------------------------------------------------------------------
      Bolos -> formulario: elegir un formato lo deja marcado en el form
      ------------------------------------------------------------------ */
   function initRows() {
@@ -567,6 +585,7 @@
   initMagnetic();
   initSpot();
   initHeader();
+  initBand();
   initRows();
   initForm(strike);
   $$('[data-year]').forEach(n => { n.textContent = new Date().getFullYear(); });

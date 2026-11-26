@@ -9,7 +9,7 @@ index.html            contenido de la home
 css/styles.css        estilos
 js/main.js            animaciones e interacciones
 assets/fonts/         tipografías autoalojadas (Archivo y Pirata One, licencia SIL OFL)
-assets/img/           favicon
+assets/img/           favicon y fotos de la banda
 ```
 
 ## Verla en local
