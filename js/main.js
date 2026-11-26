@@ -22,23 +22,31 @@
     px: innerWidth / 2, // puntero en px
     py: innerHeight / 2,
     sv: 0,              // velocidad de scroll suavizada (px/ms)
-    energy: 0           // 0..1, sube con cada rayo y decae sola
+    energy: 0,          // 0..1, sube con cada rayo y decae sola
+    now: performance.now()   // reloj del último fotograma: el único que usan las animaciones
   };
   const subs = [];
+  const broken = new Set();
   let lastT = performance.now();
   let lastY = scrollY;
 
   function frame(now) {
+    requestAnimationFrame(frame);   // lo primero: pase lo que pase, el bucle sigue
     const dt = clamp(now - lastT, 1, 50);
     lastT = now;
+    S.now = now;
     const y = scrollY;
     S.sv = lerp(S.sv, (y - lastY) / dt, 0.14);
     lastY = y;
     if (Math.abs(S.sv) < 0.001) S.sv = 0;
     S.energy *= Math.pow(0.93, dt / 16.7);
     if (S.energy < 0.001) S.energy = 0;
-    for (const fn of subs) fn(now, dt);
-    requestAnimationFrame(frame);
+    for (const fn of subs) {
+      // un fallo en una animación no debe parar las demás; se avisa una sola vez
+      try { fn(now, dt); } catch (err) {
+        if (!broken.has(fn)) { broken.add(fn); console.error(err); }
+      }
+    }
   }
 
   addEventListener('pointermove', e => {
@@ -429,8 +437,10 @@
       flash.classList.add('go');
     }
 
+    // Los efectos nacen con el reloj del fotograma (S.now), no con el del evento: el del clic
+    // puede ir unos milisegundos por delante y daría tiempos negativos al dibujar.
     function sparksAt(x, y, n) {
-      const now = performance.now();
+      const now = S.now;
       for (let i = 0; i < n; i++) {
         const a = Math.random() * Math.PI * 2, sp = 0.12 + Math.random() * 0.5;
         sparks.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.22, born: now, life: 380 + Math.random() * 380 });
@@ -453,8 +463,8 @@
         const len = 70 + Math.random() * 190;
         lines.push({ pts: jag(p[0], p[1], p[0] + Math.cos(ang) * len, p[1] + Math.sin(ang) * len, len * 0.3, 4), w: 1.4 });
       }
-      bolts.push({ born: now, life: 480, blur: 26, lines });
-      rings.push({ x, y, born: now, life: 560 });
+      bolts.push({ born: S.now, life: 480, blur: 26, lines });
+      rings.push({ x, y, born: S.now, life: 560 });
       sparksAt(x, y, 16);
       S.energy = 1;
       flashAt(x, y);
@@ -462,13 +472,14 @@
 
     // Arco corto que pasa por una serie de puntos (electricidad sobre el título)
     function arc(way) {
+      if (way.length < 2) return;
       let pts = [];
       for (let i = 0; i < way.length - 1; i++) {
         const a = way[i], b = way[i + 1];
         const leg = jag(a[0], a[1], b[0], b[1], Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.42, 3, true);
         pts = pts.concat(i ? leg.slice(1) : leg);
       }
-      bolts.push({ born: performance.now(), life: 120 + Math.random() * 140, blur: 14, lines: [{ pts, w: 1.5 + Math.random() * 1.3 }] });
+      bolts.push({ born: S.now, life: 120 + Math.random() * 140, blur: 14, lines: [{ pts, w: 1.5 + Math.random() * 1.3 }] });
     }
 
     // Destello y chispas sin rayo (impacto de la intro)
@@ -490,7 +501,7 @@
 
       for (let i = bolts.length - 1; i >= 0; i--) {
         const b = bolts[i];
-        const t = (now - b.born) / b.life;
+        const t = Math.max(0, (now - b.born) / b.life);
         if (t >= 1) { bolts.splice(i, 1); continue; }
         const a = Math.pow(1 - t, 1.5) * (t < 0.45 ? 0.6 + Math.random() * 0.4 : 1);
         for (const ln of b.lines) {
@@ -511,11 +522,11 @@
 
       for (let i = rings.length - 1; i >= 0; i--) {
         const r = rings[i];
-        const t = (now - r.born) / r.life;
+        const t = Math.max(0, (now - r.born) / r.life);
         if (t >= 1) { rings.splice(i, 1); continue; }
         const e = 1 - Math.pow(1 - t, 3);
         ctx.beginPath();
-        ctx.arc(r.x, r.y, 6 + e * 110, 0, Math.PI * 2);
+        ctx.arc(r.x, r.y, Math.max(0, 6 + e * 110), 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(242,110,38,${((1 - t) * 0.8).toFixed(3)})`;
         ctx.lineWidth = 2.5 * (1 - t) + 0.5;
         ctx.stroke();
@@ -523,7 +534,7 @@
 
       for (let i = sparks.length - 1; i >= 0; i--) {
         const p = sparks[i];
-        const t = (now - p.born) / p.life;
+        const t = Math.max(0, (now - p.born) / p.life);
         if (t >= 1) { sparks.splice(i, 1); continue; }
         p.vy += 0.0012 * dt;
         p.x += p.vx * dt;
