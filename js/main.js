@@ -576,52 +576,19 @@
       measure();
       addEventListener('resize', measure);
 
-      // Con data-marquee-lead la cinta espera quieta, con su primer elemento alineado
-      // al margen, hasta que se ve bien en pantalla: así se lee primero ese elemento.
-      const lead = track.hasAttribute('data-marquee-lead');
-      const wrap = $('.wrap');
-      const inset = lead && wrap ? parseFloat(getComputedStyle(wrap).paddingLeft) || 0 : 0;
-      let x = dir < 0 ? inset : -unit;
+      let x = dir < 0 ? 0 : -unit;
       track.style.transform = `translate3d(${x}px,0,0)`;
       if (RM) return;
 
-      let running = !lead, seen = !lead, since = 0;
-
-      // El rótulo de escenarios se puede parar: con su botón y, con ratón, al pasar por encima
-      let paused = false, hover = false;
-      const toggle = lead ? $('[data-marquee-toggle]') : null;
-      if (toggle) {
-        const label = $('[data-label]', toggle);
-        toggle.hidden = false;
-        toggle.addEventListener('click', () => {
-          paused = !paused;
-          label.textContent = paused ? 'Reanudar' : 'Pausar';
-        });
-        if (FINE) {
-          track.parentElement.addEventListener('pointerenter', () => { hover = true; });
-          track.parentElement.addEventListener('pointerleave', () => { hover = false; });
-        }
-      }
+      // Solo avanzan mientras están en pantalla
+      let running = true;
       if ('IntersectionObserver' in window) {
-        new IntersectionObserver(es => {
-          const en = es[es.length - 1];
-          if (en.intersectionRatio >= 0.6) seen = true;
-          running = en.isIntersecting && seen;
-        }, { threshold: [0, 0.6] }).observe(track.parentElement);
-      } else {
-        running = true;
+        new IntersectionObserver(es => { running = es[es.length - 1].isIntersecting; }).observe(track.parentElement);
       }
 
       subs.push((now, dt) => {
-        if (!running || paused || hover) return;
-        let boost = Math.abs(S.sv) * 0.5;
-        if (lead) {
-          // al arrancar: un momento quieta y, durante unos segundos, sin el acelerón del scroll
-          if (!since) since = now;
-          if (now - since < 1200) return;
-          if (now - since < 6000) boost = 0;
-        }
-        x += dir * (speed / 1000 + boost) * dt;
+        if (!running) return;
+        x += dir * (speed / 1000 + Math.abs(S.sv) * 0.5) * dt;
         if (dir < 0) { if (x <= -unit) x += unit; } else if (x > 0) x -= unit;
         const skew = clamp(S.sv * -7 * dir, -14, 14);
         track.style.transform = `translate3d(${x.toFixed(1)}px,0,0) skewX(${skew.toFixed(2)}deg)`;
