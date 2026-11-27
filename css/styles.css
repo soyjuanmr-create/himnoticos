@@ -37,6 +37,9 @@
   --f-sans: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --f-goth: "Pirata One", "Archivo", Georgia, serif;
 
+  /* Fotos en color (tarjeta activa): misma lista de funciones que el filtro en gris, para que la transición sea suave */
+  --color-on: grayscale(.38) contrast(1.06) brightness(1) sepia(.2);
+
   color-scheme: dark;
 }
 
@@ -115,9 +118,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-weight: 900; font-stretch: 62%;
   text-transform: uppercase; letter-spacing: -.005em;
 }
-.h-xl { font-size: clamp(2.6rem, 8.4vw, 8.5rem); line-height: .86; }
+/* El mínimo crece con el ancho (14vw y 17vw) para que en móvil los títulos sigan mandando sobre
+   los nombres de las tarjetas: ahí parten en dos líneas, la gótica abajo. */
+.h-xl { font-size: clamp(min(14vw, 4rem), 8.4vw, 8.5rem); line-height: .86; }
 /* 10.6vw: «¿Montamos el jaleo?» cabe en una línea desde tablet, y el formulario queda a la vista */
-.h-xxl { font-size: clamp(3.2rem, 10.6vw, 13rem); line-height: .82; }
+.h-xxl { font-size: clamp(min(17vw, 4.5rem), 10.6vw, 13rem); line-height: .82; }
 .h-xl .goth, .h-xxl .goth { font-size: 1.08em; line-height: .8; }
 
 /* ---------- Botones y enlaces ---------- */
@@ -202,9 +207,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .loader__field { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 .loader__brand {
-  position: absolute; left: 0; right: 0; top: 70%;
-  display: grid; justify-items: center; gap: clamp(.6rem, 1.2vw, 1.1rem);
-  transform: translateY(-50%);
+  position: absolute; left: 50%; top: 70%;
+  display: grid; width: max-content;   /* tan ancho como el nombre: el sello se alinea con su final */
+  transform: translate(-50%, -50%);
   opacity: 0;
 }
 .loader__name {
@@ -213,9 +218,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
   -webkit-text-stroke: .05em var(--bg); paint-order: stroke fill;
   text-shadow: 0 0 .5em rgba(242, 110, 38, .6), 0 .05em .35em rgba(0, 0, 0, .9);
 }
+/* El mismo sello que en el hero: opaco, así el rayo y el resplandor no le quitan lectura */
 .loader__tag {
-  font-size: clamp(.7rem, 1.1vw, .95rem); font-weight: 700; font-stretch: 112%;
-  letter-spacing: .5em; text-indent: .5em; text-transform: uppercase; color: var(--orange);
+  justify-self: end; margin: -.28em 3% 0 0; padding: .08em .5em .16em;
+  font-family: var(--f-goth); font-size: clamp(1.3rem, 3vw, 2.7rem); line-height: 1;
+  background: var(--orange); color: var(--bg);
+  box-shadow: .12em .12em 0 var(--bg);
+  transform: rotate(-4deg) skewX(-11deg);
 }
 
 /* El nombre se enciende como un neón cuando cae el rayo */
@@ -235,7 +244,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .loader.out .loader__brand { animation: brand-out .45s var(--ease) both; }
 @keyframes brand-out {
   from { opacity: 1; }
-  to { opacity: 0; transform: translateY(-50%) scale(1.06); filter: blur(6px); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(1.06); filter: blur(6px); }
 }
 
 /* ---------- Cabecera ---------- */
@@ -405,9 +414,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .no-intro.is-in .hero__tag { transition-delay: .45s; }
 
 /* ---------- Cintas ---------- */
+/* Se cruzan en X, con el cruce a la izquierda del centro. Los ángulos tienen que diferir lo bastante
+   para que la cinta de detrás asome a los dos lados: con ángulos parecidos, la de delante la tapa entera. */
 .tapes {
+  --tape-a: -5.5deg; --tape-b: 6.5deg; --tape-shift: 3vw;
   position: relative; z-index: 3; pointer-events: none;
-  height: clamp(8rem, 15vw, 13rem); margin-top: -1.5rem;
+  height: calc(10vw + 5rem);   /* lo que sube la punta de la cinta naranja (≈ 4,8vw) más su grosor, por arriba y por abajo */
   overflow: hidden;
 }
 @supports (overflow: clip) {
@@ -416,13 +428,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .tape { position: absolute; left: -6vw; top: 50%; width: 112vw; overflow: hidden; }
 .tape--a {
   z-index: 2; background: var(--orange); color: var(--bg);
-  transform: translateY(-50%) rotate(-3.2deg);
+  transform: translateY(-50%) rotate(var(--tape-a));
   box-shadow: 0 .6rem 2.4rem rgba(0, 0, 0, .55);
 }
 .tape--b {
   background: var(--bg); color: var(--orange);
   border-block: 1px solid var(--orange);
-  transform: translateY(-50%) rotate(2.4deg);
+  transform: translateY(calc(-50% + var(--tape-shift))) rotate(var(--tape-b));
 }
 .tape__track {
   display: flex; align-items: center; width: max-content;
@@ -435,6 +447,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-size: clamp(.8rem, 1.4vw, 1.25rem); font-weight: 700; font-stretch: 125%; letter-spacing: .1em;
 }
 .tape__track .i { width: .7em; height: .7em; margin-inline: .75em; }
+/* En pantallas estrechas las cintas no adelgazan tanto como el ancho: hace falta más ángulo */
+@media (max-width: 480px) {
+  .tapes { --tape-a: -9deg; --tape-b: 11deg; --tape-shift: 6.5vw; height: 10rem; }
+}
 
 /* ---------- Manifiesto ---------- */
 .manifesto { padding-block: clamp(5rem, 12vw, 11rem) clamp(4rem, 9vw, 8rem); }
@@ -480,7 +496,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .member__photo img {
   display: block; width: 100%; height: 100%;
   object-fit: cover; object-position: var(--pos, 50% 20%);
-  filter: grayscale(1) contrast(1.15) brightness(.95);
+  /* --c y --b se pueden afinar por foto (en el style de la imagen) para igualar las de día con las de noche */
+  filter: grayscale(1) contrast(var(--c, 1.15)) brightness(var(--b, .95)) sepia(0);
   transform: scale(1.02);
   transition: filter .6s var(--ease), transform 1.1s var(--ease);
 }
@@ -496,12 +513,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
   letter-spacing: .22em; text-transform: uppercase; color: var(--muted);
 }
 
-/* La foto recupera el color: al pasar el ratón o, en táctil, la tarjeta activa */
-.member.is-active .member__photo img { filter: none; transform: scale(1.08); }
+/* La foto recupera el color: al pasar el ratón o, en táctil, la tarjeta activa.
+   No del todo: algo desaturado y templado, para que las luces de escenario no se salgan de la paleta. */
+.member.is-active .member__photo img { filter: var(--color-on); transform: scale(1.08); }
 .member.is-active .member__photo::before { transform: none; }
 .member.is-active .member__name { transform: skewX(-11deg) scale(1.08); }
 @media (hover: hover) {
-  .member:hover .member__photo img { filter: none; transform: scale(1.08); }
+  .member:hover .member__photo img { filter: var(--color-on); transform: scale(1.08); }
   .member:hover .member__photo::before { transform: none; }
   .member:hover .member__name { transform: skewX(-11deg) scale(1.08); }
 }
@@ -522,7 +540,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .live { padding-block: clamp(3rem, 7vw, 7rem) clamp(4rem, 9vw, 8rem); }
 .live__head { display: grid; gap: clamp(1.4rem, 2.6vw, 2.6rem); margin-bottom: clamp(2.6rem, 5vw, 4.8rem); }
 .live__list {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 20.5rem)) minmax(12rem, 1fr); align-items: start;
+  /* Las tarjetas crecen con el ancho, hasta donde la tarjeta entera sigue cabiendo en pantalla (42vh de ancho ≈ 75vh de alto) */
+  display: grid; grid-template-columns: repeat(3, minmax(0, clamp(18rem, 22vw, min(34rem, 42vh)))) minmax(12rem, 1fr); align-items: start;
   gap: clamp(1rem, 2.4vw, 2.4rem);
 }
 .js-ready .live__list[data-reveal] { opacity: 1; translate: none; }
@@ -544,11 +563,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .clip__link::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(transparent 45%, rgba(10, 9, 8, .86));
+  background: linear-gradient(transparent 40%, rgba(10, 9, 8, .62) 70%, rgba(10, 9, 8, .88));
 }
 .clip__link img {
   display: block; width: 100%; height: 100%; object-fit: cover;
-  filter: grayscale(1) contrast(1.12) brightness(.9);
+  filter: grayscale(1) contrast(var(--c, 1.12)) brightness(var(--b, .9)) sepia(0);
   transform: scale(1.02);
   transition: filter .6s var(--ease), transform 1.1s var(--ease);
 }
@@ -571,16 +590,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .clip__n { font-size: .75rem; font-weight: 700; letter-spacing: .2em; color: var(--orange); }
 .clip__t { font-size: clamp(1.6rem, 2.4vw, 2.3rem); line-height: .95; color: var(--cream); }
 
-.clip.is-active .clip__link img { filter: none; transform: scale(1.07); }
+.clip.is-active .clip__link img { filter: var(--color-on); transform: scale(1.07); }
 @media (hover: hover) {
   .clip:hover { rotate: 0deg; }
-  .clip:hover .clip__link img { filter: none; transform: scale(1.07); }
+  .clip:hover .clip__link img { filter: var(--color-on); transform: scale(1.07); }
   .clip:hover .clip__play { transform: scale(1.14); }
   .clip:hover .clip__play::before { animation: ring 1s var(--ease) infinite; }
 }
 @keyframes ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.7); } }
 
 .live__more { align-self: end; display: grid; justify-items: start; gap: 1rem; padding-bottom: .4rem; }
+/* Bloque, no flex: si el enlace parte en dos líneas, la flecha sigue a la última palabra en vez de quedarse suelta a la derecha */
+.live__more .link { display: block; }
+.live__more .link .i { display: inline-block; margin-left: .25em; vertical-align: -.06em; }
 .live__note { max-width: 30ch; font-size: .8rem; line-height: 1.4; color: var(--muted); }
 .live__note a { text-decoration: underline; text-underline-offset: .15em; }
 
@@ -681,20 +703,26 @@ html.is-locked { overflow: hidden; }
 .dossier__d { margin-top: .45rem; color: var(--muted); }
 
 /* ---------- Escenarios ---------- */
-.stages { overflow: hidden; padding-block: clamp(3rem, 6vw, 6rem) clamp(4rem, 8vw, 7rem); }
-.stages__top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .6rem 2rem; margin-top: 1.1rem; }
-.stages__pause { border: 0; border-radius: 0; padding-inline: 0; cursor: pointer; }
-.stages__lead { font-size: clamp(1.3rem, 2.4vw, 2.2rem); font-weight: 800; font-stretch: 75%; text-transform: uppercase; }
-.stages__marquee { margin-top: clamp(1.2rem, 2.4vw, 2.4rem); padding-block: clamp(.7rem, 1.4vw, 1.4rem); border-block: 1px solid var(--line); }
-.stages__track {
-  display: flex; align-items: center; width: max-content;
-  font-size: clamp(3rem, 8.6vw, 8.6rem); font-weight: 900; font-stretch: 75%;
-  line-height: 1; white-space: nowrap; text-transform: uppercase;
-  will-change: transform;
+/* Lista fija: son pocos nombres y se tienen que leer todos de un vistazo */
+.stages { padding-block: clamp(3rem, 7vw, 7rem) clamp(4rem, 9vw, 8rem); }
+.stages__head { display: grid; gap: clamp(1.4rem, 2.6vw, 2.6rem); margin-bottom: clamp(2rem, 4vw, 3.6rem); }
+.stages__list {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: .1em .5em;
+  padding-block: clamp(1rem, 2vw, 2rem); border-block: 1px solid var(--line);
+  font-size: clamp(min(10.3vw, 2.5rem), 6.6vw, 7.4rem); font-weight: 900; font-stretch: 75%;
+  line-height: 1.04; text-transform: uppercase;
 }
-.stages__track span { color: var(--bg-2); -webkit-text-stroke: 1.5px var(--cream); paint-order: stroke fill; }
-.stages__track span.is-solid { color: var(--cream); -webkit-text-stroke: 0; }
-.stages__track .i { width: .42em; height: .42em; margin-inline: .5em; color: var(--orange); }
+.stages__list li { min-width: 0; color: var(--bg-2); -webkit-text-stroke: 1.5px var(--cream); paint-order: stroke fill; }
+.stages__list li.is-solid { color: var(--cream); -webkit-text-stroke: 0; }
+.stages__list .i { display: inline-block; width: .42em; height: .42em; margin-left: .3em; vertical-align: .13em; color: var(--orange); }
+
+/* Los nombres entran uno detrás de otro */
+.js-ready .stages__list[data-reveal] { opacity: 1; translate: none; }
+.js-ready .stages__list li { opacity: 0; translate: 0 40px; }
+.js-ready .stages__list.in li {
+  opacity: 1; translate: 0 0;
+  transition: opacity .9s var(--ease) calc(var(--i) * 90ms), translate 1s var(--ease) calc(var(--i) * 90ms);
+}
 
 /* ---------- Contratación ---------- */
 .contact {
@@ -890,9 +918,9 @@ html.is-locked { overflow: hidden; }
       linear-gradient(to bottom, transparent 44%, rgba(10, 9, 8, .86) 64%, var(--bg));   /* oscurece bajo el título, donde van el subtítulo y el botón */
   }
   .hero__meta { letter-spacing: .16em; }
-  .hero__meta span:first-child { display: none; }   /* «Jaleo Band» ya está en el sello del título */
   .hero__name { font-stretch: 68%; font-size: 17.6vw; transform: scaleY(1.2); transform-origin: bottom; }
-  .hero__los { margin-bottom: .34em; text-shadow: 0 .03em .28em rgba(10, 9, 8, .85); }   /* ahora cae sobre las rayas del rayo */
+  /* Aquí cae sobre las rayas del rayo: en crema, porque en naranja se fundía con ellas */
+  .hero__los { margin-bottom: .34em; color: var(--cream); text-shadow: 0 .03em .28em rgba(10, 9, 8, .85); }
   .hero__tag { margin-top: -.5em; }
   .hero__foot { flex-direction: column; align-items: flex-start; gap: 1.4rem; margin-top: 3.4rem; }
   .hero__cta { flex-wrap: wrap; gap: .9rem 1.1rem; max-width: 100%; }

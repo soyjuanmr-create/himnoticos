@@ -78,8 +78,12 @@ Las tarjetas de «En directo» abren el reproductor oficial de Instagram en una 
 
 Para cambiar un vídeo: en `index.html`, sustituir el identificador del reel (en `href` y en `data-reel`) y su portada en `assets/img/videos/`.
 
+## Fotos
+
+Las fotos de la banda y las portadas de los vídeos se ven en blanco y negro, y recuperan el color (algo contenido) al pasar el ratón o, en táctil, en la tarjeta activa. Si una foto nueva desentona con las demás —por ejemplo, una de día entre fotos de noche—, se puede afinar su contraste y su brillo en el atributo `style` de la imagen: `style="--c:1.3; --b:.72"` (`--c` contraste, `--b` brillo).
+
 ## Accesibilidad y movimiento
 
 Con la opción del sistema «reducir movimiento» activada, la web se muestra sin intro, sin rayos y con el fondo estático.
 
-La intro solo se ve en la primera carga de cada sesión del navegador; en las siguientes, la página entra directamente. Para eso se guarda una marca en `sessionStorage` (`himnoticos-intro`), explicada en la sección de cookies de `legal.html`. El rótulo de escenarios se puede parar con su botón «Pausar» o, con ratón, dejando el puntero encima.
+La intro solo se ve en la primera carga de cada sesión del navegador; en las siguientes, la página entra directamente. Para eso se guarda una marca en `sessionStorage` (`himnoticos-intro`), explicada en la sección de cookies de `legal.html`.

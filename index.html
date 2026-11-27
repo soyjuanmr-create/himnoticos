@@ -110,7 +110,6 @@
       <canvas class="hero__field" aria-hidden="true"></canvas>
 
       <div class="hero__meta" data-in style="--d:.9s">
-        <span>Jaleo Band</span>
         <span>Valencia y donde haga falta</span>
       </div>
 
@@ -172,7 +171,7 @@
       <ul class="live__list" data-reveal>
         <li class="clip" style="--i:0">
           <a class="clip__link" href="https://www.instagram.com/reel/DePd9joRGf-/" target="_blank" rel="noopener" data-reel="DePd9joRGf-">
-            <img src="assets/img/videos/reel-1.webp" width="720" height="1280" alt="Los Himnóticos ante el público de un festival, a pleno sol" loading="lazy" decoding="async">
+            <img src="assets/img/videos/reel-1.webp" width="720" height="1280" alt="Los Himnóticos ante el público de un festival, a pleno sol" loading="lazy" decoding="async" style="--c:1.4; --b:.8">
             <span class="clip__play" aria-hidden="true"><svg class="i"><use href="#i-play"/></svg></span>
             <span class="clip__cap"><span class="clip__n" aria-hidden="true">01</span><span class="clip__t goth">Festival</span></span>
             <span class="sr-only">Reproducir vídeo</span>
@@ -228,7 +227,7 @@
         </li>
         <li class="member" style="--i:3">
           <figure>
-            <div class="member__photo"><img src="assets/img/banda/paco.webp" width="527" height="806" alt="Paco a la batería con gafas de sol" loading="lazy" decoding="async" style="--pos:50% 10%"></div>
+            <div class="member__photo"><img src="assets/img/banda/paco.webp" width="527" height="806" alt="Paco a la batería con gafas de sol" loading="lazy" decoding="async" style="--pos:50% 10%; --c:1.3; --b:.72"></div>
             <figcaption><span class="member__name goth">Paco</span><span class="member__role">Batería</span></figcaption>
           </figure>
         </li>
@@ -289,31 +288,18 @@
     </section>
 
     <!-- ESCENARIOS -->
-    <section class="stages" id="escenarios">
-      <div class="wrap">
+    <section class="stages wrap" id="escenarios">
+      <header class="stages__head">
         <p class="label" data-reveal><b>05</b> Escenarios</p>
-        <div class="stages__top" data-reveal>
-          <p class="stages__lead">Ya ha habido jaleo en</p>
-          <!-- Solo aparece cuando el rótulo se mueve (lo activa el script) -->
-          <button class="link stages__pause" type="button" data-marquee-toggle hidden><span data-label>Pausar</span><span class="sr-only"> el rótulo en movimiento</span></button>
-        </div>
-      </div>
-      <ul class="sr-only">
-        <li>Roig Arena</li>
-        <li>Love to Rock</li>
-        <li>Hard Rock Cafe Valencia</li>
-        <li>Tardeo Canalla</li>
-        <li>Vicio BCN</li>
+        <h2 class="h-xl" data-reveal>Ya ha habido <em class="goth">jaleo en</em></h2>
+      </header>
+      <ul class="stages__list" data-reveal>
+        <li class="is-solid" style="--i:0">Roig Arena&nbsp;<svg class="i" aria-hidden="true"><use href="#i-bolt"/></svg></li>
+        <li style="--i:1">Love to Rock&nbsp;<svg class="i" aria-hidden="true"><use href="#i-bolt"/></svg></li>
+        <li class="is-solid" style="--i:2">Hard Rock Cafe Valencia&nbsp;<svg class="i" aria-hidden="true"><use href="#i-bolt"/></svg></li>
+        <li style="--i:3">Tardeo Canalla&nbsp;<svg class="i" aria-hidden="true"><use href="#i-bolt"/></svg></li>
+        <li class="is-solid" style="--i:4">Vicio BCN</li>
       </ul>
-      <div class="stages__marquee" aria-hidden="true">
-        <div class="stages__track" data-marquee="-1" data-speed="90" data-marquee-lead>
-          <span class="is-solid">Roig Arena</span><svg class="i"><use href="#i-bolt"/></svg>
-          <span>Love to Rock</span><svg class="i"><use href="#i-bolt"/></svg>
-          <span class="is-solid">Hard Rock Cafe Valencia</span><svg class="i"><use href="#i-bolt"/></svg>
-          <span>Tardeo Canalla</span><svg class="i"><use href="#i-bolt"/></svg>
-          <span class="is-solid">Vicio BCN</span><svg class="i"><use href="#i-bolt"/></svg>
-        </div>
-      </div>
     </section>
 
     <!-- CONTRATACIÓN -->
