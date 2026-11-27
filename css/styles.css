@@ -447,10 +447,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .tape__track .i { width: .7em; height: .7em; margin-inline: .75em; }
 
 /* ---------- Manifiesto ---------- */
-.manifesto {
-  position: relative;
-  padding-block: clamp(5rem, 12vw, 11rem) clamp(9.5rem, 14vw, 13rem);
-}
+.manifesto { padding-block: clamp(5rem, 12vw, 11rem) clamp(4rem, 9vw, 8rem); }
 .manifesto__text {
   margin-top: clamp(1.6rem, 3vw, 3rem);
   font-size: clamp(2rem, 5.7vw, 5.8rem); font-weight: 800; font-stretch: 75%;
@@ -460,8 +457,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .js-ready .manifesto__text .w { opacity: .13; transition: opacity .4s linear; }
 .js-ready .manifesto__text .w.on { opacity: 1; }
 
+/* La última frase y el sello comparten fila: el sello queda pegado al cierre del manifiesto */
+.manifesto__end { display: flex; align-items: center; gap: clamp(.8rem, 2.4vw, 2.6rem); }
+.manifesto__end p { min-width: 0; }
 .badge {
-  position: absolute; right: var(--gutter); bottom: clamp(1.6rem, 3.4vw, 3.4rem);
+  position: relative; flex: none;
   display: grid; place-items: center; overflow: hidden;
   width: clamp(6.5rem, 10.5vw, 10rem); aspect-ratio: 1;
   color: var(--cream);

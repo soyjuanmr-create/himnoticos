@@ -163,14 +163,19 @@
     <!-- MANIFIESTO -->
     <section class="manifesto wrap" id="manifiesto">
       <p class="label" data-reveal><b>01</b> Manifiesto</p>
-      <p class="manifesto__text" data-scrolltext>No somos música de fondo. Somos los <em class="goth">himnos</em> que te sabes de memoria, tocados en directo. Tú pones la fiesta. Nosotros, <em class="goth">el jaleo.</em></p>
-
-      <div class="badge" aria-hidden="true">
-        <svg class="badge__ring" viewBox="0 0 200 200">
-          <defs><path id="badge-circle" d="M100 100m-78 0a78 78 0 1 1 156 0a78 78 0 1 1-156 0"/></defs>
-          <text><textPath href="#badge-circle" textLength="486" lengthAdjust="spacing">ROCK AND ROLL • JALEO BAND • ROCK AND ROLL • JALEO BAND •</textPath></text>
-        </svg>
-        <svg class="badge__bolt"><use href="#logo-bolt-mini"/></svg>
+      <!-- El sello cierra el manifiesto: va junto a la última frase, no suelto en una esquina -->
+      <div class="manifesto__text" data-scrolltext>
+        <p>No somos música de fondo. Somos los <em class="goth">himnos</em> que te sabes de memoria, tocados en directo.</p>
+        <div class="manifesto__end">
+          <p>Tú pones la fiesta. Nosotros, <em class="goth">el jaleo.</em></p>
+          <div class="badge" aria-hidden="true">
+            <svg class="badge__ring" viewBox="0 0 200 200">
+              <defs><path id="badge-circle" d="M100 100m-78 0a78 78 0 1 1 156 0a78 78 0 1 1-156 0"/></defs>
+              <text><textPath href="#badge-circle" textLength="486" lengthAdjust="spacing">ROCK AND ROLL • JALEO BAND • ROCK AND ROLL • JALEO BAND •</textPath></text>
+            </svg>
+            <svg class="badge__bolt"><use href="#logo-bolt-mini"/></svg>
+          </div>
+        </div>
       </div>
     </section>
 
