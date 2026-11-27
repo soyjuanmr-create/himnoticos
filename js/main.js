@@ -586,6 +586,22 @@
       if (RM) return;
 
       let running = !lead, seen = !lead, since = 0;
+
+      // El rótulo de escenarios se puede parar: con su botón y, con ratón, al pasar por encima
+      let paused = false, hover = false;
+      const toggle = lead ? $('[data-marquee-toggle]') : null;
+      if (toggle) {
+        const label = $('[data-label]', toggle);
+        toggle.hidden = false;
+        toggle.addEventListener('click', () => {
+          paused = !paused;
+          label.textContent = paused ? 'Reanudar' : 'Pausar';
+        });
+        if (FINE) {
+          track.parentElement.addEventListener('pointerenter', () => { hover = true; });
+          track.parentElement.addEventListener('pointerleave', () => { hover = false; });
+        }
+      }
       if ('IntersectionObserver' in window) {
         new IntersectionObserver(es => {
           const en = es[es.length - 1];
@@ -597,7 +613,7 @@
       }
 
       subs.push((now, dt) => {
-        if (!running) return;
+        if (!running || paused || hover) return;
         let boost = Math.abs(S.sv) * 0.5;
         if (lead) {
           // al arrancar: un momento quieta y, durante unos segundos, sin el acelerón del scroll
@@ -633,8 +649,8 @@
               words.push(s);
             });
             n.replaceWith(frag);
-          } else if (n.nodeType === 1) {
-            walk(n);
+          } else if (n.nodeType === 1 && n.getAttribute('aria-hidden') !== 'true') {
+            walk(n);   // lo decorativo (el sello) se deja como está
           }
         });
       };
@@ -666,7 +682,9 @@
         en.target.classList.add('in');
         io.unobserve(en.target);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+      // umbral 0: basta con que asome. Con un porcentaje del elemento, uno muy alto (el formulario)
+      // podía quedarse invisible en pantallas bajas aunque ya estuviera en pantalla.
+    }, { threshold: 0, rootMargin: '0px 0px -6% 0px' });
     els.forEach(e => io.observe(e));
   }
 
@@ -705,8 +723,16 @@
   function initHeader() {
     const top = $('.top');
     if (!top) return;
-    const upd = () => top.classList.toggle('is-stuck', scrollY > 40);
+    const contact = $('.contact');
+    const upd = () => {
+      top.classList.toggle('is-stuck', scrollY > 40);
+      if (!contact) return;
+      // sobre la sección de contratación va opaca y sin su botón, que ahí ya no hace falta
+      const r = contact.getBoundingClientRect(), h = top.offsetHeight;
+      top.classList.toggle('is-contact', r.top < h && r.bottom > h);
+    };
     addEventListener('scroll', upd, { passive: true });
+    addEventListener('resize', upd);
     upd();
   }
 
@@ -727,7 +753,8 @@
 
   /* ------------------------------------------------------------------
      Carruseles (la banda, los vídeos): en táctil no hay hover, así que
-     recupera el color la tarjeta centrada (o, en la banda, la que se toque)
+     recupera el color la tarjeta centrada. En la banda, tocar una tarjeta
+     la trae al centro; si no hay carrusel (tablet), alterna su color.
      ------------------------------------------------------------------ */
   function initSwipeColor() {
     if (FINE) return;
@@ -736,10 +763,15 @@
       if (!list) return;
       const cards = $$(itemSel, list);
       const setActive = el => cards.forEach(c => c.classList.toggle('is-active', c === el));
-      if (tap) cards.forEach(c => c.addEventListener('click', () => setActive(c.classList.contains('is-active') ? null : c)));
+      const isCarousel = () => list.scrollWidth > list.clientWidth + 4;
+      if (tap) cards.forEach(c => c.addEventListener('click', () => {
+        if (!isCarousel()) { setActive(c.classList.contains('is-active') ? null : c); return; }
+        const lr = list.getBoundingClientRect(), cr = c.getBoundingClientRect();
+        list.scrollBy({ left: cr.left + cr.width / 2 - (lr.left + lr.width / 2), behavior: RM ? 'auto' : 'smooth' });
+      }));
       if (!('IntersectionObserver' in window)) return;
       const io = new IntersectionObserver(entries => {
-        if (list.scrollWidth <= list.clientWidth + 4) return;   // sin carrusel no hay tarjeta "centrada"
+        if (!isCarousel()) return;   // sin carrusel no hay tarjeta "centrada"
         entries.forEach(en => { if (en.isIntersecting) setActive(en.target); });
       }, { root: list, rootMargin: '0px -40% 0px -40%', threshold: 0 });
       cards.forEach(c => io.observe(c));
@@ -804,6 +836,7 @@
     $$('.row[data-event]').forEach(a => {
       a.addEventListener('click', () => {
         form.elements.evento.value = a.dataset.event;
+        form.elements.evento.dispatchEvent(new Event('input', { bubbles: true }));
         const first = form.elements.nombre;
         if (first) setTimeout(() => first.focus({ preventScroll: true }), 900);
       });
@@ -821,11 +854,15 @@
     const btn = $('button[type="submit"]', form);
     const say = (msg, state) => { status.textContent = msg; status.dataset.state = state || ''; };
 
-    // Fecha mínima: hoy (en hora local)
+    // Fecha mínima: hoy (en hora local). Sin rellenar se marca para mostrarla atenuada, como los demás huecos.
     const date = form.elements.fecha;
     if (date) {
       const d = new Date();
       date.min = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const empty = () => date.toggleAttribute('data-empty', !date.value);
+      date.addEventListener('input', empty);
+      date.addEventListener('change', empty);
+      empty();
     }
 
     // Los huecos crecen con el texto donde el navegador no lo hace solo
@@ -838,18 +875,80 @@
       });
     }
 
+    /* Validación: el aviso sale junto al campo que falla y dice qué le pasa a ese campo.
+       Para el contacto basta un correo o un teléfono (sin este script, el HTML sigue exigiendo el correo). */
+    const mail = form.elements.email, tel = form.elements.telefono;
+    const fields = [form.elements.nombre, form.elements.evento, date, mail, form.elements.privacidad].filter(Boolean);
+    mail.required = false;
+    const checkContact = () => {
+      const hasTel = tel.value.replace(/\D/g, '').length >= 6;
+      mail.setCustomValidity(mail.value.trim() || hasTel ? '' : 'Déjanos un correo o un teléfono para responderte.');
+    };
+    const why = el => {
+      const v = el.validity;
+      if (el === mail) return v.customError ? el.validationMessage : 'Ese correo no parece válido. Revísalo.';
+      if (el.name === 'nombre') return 'Nos falta tu nombre.';
+      if (el.name === 'evento') return 'Elige el tipo de evento.';
+      if (el.name === 'fecha') return v.rangeUnderflow ? 'Esa fecha ya ha pasado.' : 'Esa fecha no es válida.';
+      if (el.name === 'privacidad') return 'Para enviarla, acepta la política de privacidad.';
+      return el.validationMessage;
+    };
+
+    const tip = doc.createElement('span');
+    tip.className = 'tip';
+    tip.id = 'booking-tip';
+    tip.setAttribute('aria-hidden', 'true');   // se lee como descripción del campo, no como parte de su etiqueta
+    let tipFor = null;
+    const hideTip = () => {
+      if (!tipFor) return;
+      tipFor.removeAttribute('aria-describedby');
+      tipFor = null;
+      tip.remove();
+    };
+    const showTip = el => {
+      if (el.validity.valid) { hideTip(); return; }
+      if (tipFor !== el) {
+        hideTip();
+        tipFor = el;
+        el.setAttribute('aria-describedby', tip.id);
+        const label = el.closest('label');
+        const flow = el.type === 'checkbox';   // bajo la casilla va en el flujo, para no tapar el botón de enviar
+        tip.classList.toggle('tip--flow', flow);
+        if (flow) label.after(tip); else label.append(tip);
+      }
+      tip.textContent = why(el);
+    };
+    const mark = () => fields.forEach(el => el.setAttribute('aria-invalid', String(!el.validity.valid)));
+    const validated = () => form.classList.contains('was-validated');
+
     form.setAttribute('novalidate', '');
-    form.addEventListener('input', () => { if (status.dataset.state === 'error') say(''); });
+    form.addEventListener('input', () => {
+      if (status.dataset.state === 'error') say('');
+      if (!validated()) return;
+      checkContact();
+      mark();
+      if (tipFor) showTip(tipFor);   // el aviso se actualiza al corregir y desaparece cuando el campo queda bien
+    });
+    form.addEventListener('focusin', e => {
+      if (!validated()) return;
+      if (fields.includes(e.target)) showTip(e.target); else hideTip();
+    });
+    form.addEventListener('focusout', e => { if (!form.contains(e.relatedTarget)) hideTip(); });
+
     form.addEventListener('submit', async e => {
       e.preventDefault();
       form.classList.add('was-validated');
+      checkContact();
+      mark();
 
-      if (!form.checkValidity()) {
-        const bad = form.querySelector(':invalid');
-        if (bad) bad.focus();
-        say('Nos falta algo: tu nombre, el tipo de evento, un correo válido y aceptar la política de privacidad.', 'error');
+      const bad = fields.find(el => !el.validity.valid);
+      if (bad) {
+        say('');
+        bad.focus();
+        showTip(bad);
         return;
       }
+      hideTip();
       if (form.elements._honey.value) return;   // trampa antispam
 
       const action = form.getAttribute('action') || '';
@@ -900,17 +999,19 @@
   function runIntro(field, strike) {
     const loader = $('.loader');
     const cv = loader && $('.loader__field', loader);
+    const seen = root.classList.contains('no-intro');   // ya vista en esta sesión: lo decide el script del <head>
     const enter = () => {
       root.classList.add('is-in');
       // terminada la entrada de las letras, el título ya puede desbordar (brillos)
-      setTimeout(() => { const n = $('.hero__name'); if (n) n.classList.add('is-ready'); }, RM ? 0 : 2400);
+      setTimeout(() => { const n = $('.hero__name'); if (n) n.classList.add('is-ready'); }, RM ? 0 : seen ? 1900 : 2400);
     };
-    if (!loader || !cv || RM) {
+    if (!loader || !cv || RM || seen) {
       if (loader) loader.remove();
       field.show();
       enter();
       return;
     }
+    try { sessionStorage.setItem('himnoticos-intro', '1'); } catch (e) { /* sin almacenamiento, la intro se verá cada vez */ }
 
     const ctx = cv.getContext('2d');
     let W = 0, H = 0, dpr = 1;
