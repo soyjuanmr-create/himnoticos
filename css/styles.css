@@ -22,7 +22,7 @@
 /* ---------- Variables ---------- */
 :root {
   --bg: #0a0908;
-  --bg-2: #141110;
+  --bg-2: #1c1816;   /* superficies: un escalón visible sobre el fondo (con #141110 no se distinguía) */
   --cream: #f3e9dc;
   --muted: #a2968b;
   --orange: #f26e26;
@@ -412,6 +412,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .no-intro.is-in [data-in] { transition-delay: calc(var(--d, 0s) * .3); }
 .no-intro.is-in .top { animation-delay: .1s; }
 .no-intro.is-in .hero__tag { transition-delay: .45s; }
+
+/* ---------- Resplandor de sección ---------- */
+/* Donde no hay foco de luz siguiendo al puntero (táctil, o con «reducir movimiento»), las secciones
+   negras se quedaban planas: un resplandor fijo detrás de cada título les da la misma calidez. */
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .live__head, .band__head, .formats__head, .stages__head { position: relative; isolation: isolate; }
+  .live__head::before, .band__head::before, .formats__head::before, .stages__head::before {
+    content: ""; position: absolute; z-index: -1; pointer-events: none;
+    inset: -5.5rem calc(var(--gutter) * -1);
+    /* se apaga justo en los bordes superior e inferior de la caja: no deja corte */
+    background: radial-gradient(ellipse 80% 50% at 26% 50%, rgba(242, 110, 38, .15), rgba(200, 40, 28, .06) 48%, transparent);
+  }
+}
 
 /* ---------- Cintas ---------- */
 /* Se cruzan en X, con el cruce a la izquierda del centro. Los ángulos tienen que diferir lo bastante
