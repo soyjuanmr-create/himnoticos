@@ -116,7 +116,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   text-transform: uppercase; letter-spacing: -.005em;
 }
 .h-xl { font-size: clamp(2.6rem, 8.4vw, 8.5rem); line-height: .86; }
-/* 10.6vw: «¿Montamos el jaleo?» cabe en una línea desde tablet, y el formulario queda a la vista */
+/* 10.6vw: «¿Montamos un jaleo?» cabe en una línea desde tablet, y el formulario queda a la vista */
 .h-xxl { font-size: clamp(3.2rem, 10.6vw, 13rem); line-height: .82; }
 .h-xl .goth, .h-xxl .goth { font-size: 1.08em; line-height: .8; }
 
@@ -450,6 +450,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ---------- La banda ---------- */
 .band { padding-block: clamp(3rem, 7vw, 7rem) clamp(4rem, 9vw, 8rem); }
 .band__head { display: grid; gap: clamp(1.4rem, 2.6vw, 2.6rem); margin-bottom: clamp(2.4rem, 5vw, 4.5rem); }
+.band__lead { max-width: 44ch; font-size: clamp(1.05rem, 1.5vw, 1.4rem); line-height: 1.35; color: var(--muted); text-wrap: pretty; }
+.band__lead strong { display: block; margin-bottom: .35em; color: var(--cream); font-weight: 800; }
 .band__list {
   display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: start;
   gap: clamp(.8rem, 1.5vw, 1.5rem);
