@@ -649,8 +649,8 @@
               words.push(s);
             });
             n.replaceWith(frag);
-          } else if (n.nodeType === 1 && n.getAttribute('aria-hidden') !== 'true') {
-            walk(n);   // lo decorativo (el sello) se deja como está
+          } else if (n.nodeType === 1) {
+            walk(n);
           }
         });
       };

@@ -373,15 +373,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @media (min-width: 761px) {
   .hero__foot { margin-bottom: auto; }
 }
-.hero__sub { max-width: 40ch; font-size: clamp(1.05rem, 1.55vw, 1.45rem); line-height: 1.3; }
-/* Escenarios ya pisados, a la vista sin esperar al rótulo en movimiento de más abajo */
-.hero__proof { margin-top: clamp(.9rem, 1.4vw, 1.3rem); }
-.hero__proof span {
-  display: block;
-  font-size: .75rem; font-weight: 600; font-stretch: 112%;
-  letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
-}
-.hero__proof strong { display: block; margin-top: .3em; font-size: clamp(.9rem, 1.15vw, 1.05rem); font-weight: 700; }
+.hero__sub { max-width: 31ch; font-size: clamp(1.05rem, 1.55vw, 1.45rem); line-height: 1.3; text-wrap: balance; }
 .hero__cta { display: flex; align-items: center; gap: 1.6rem; flex: none; }
 
 .hero__hint {
@@ -401,8 +393,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* En vertical ancho (tablet) el rayo pasa por detrás del texto: un velo lo mantiene legible */
 @media (min-width: 761px) and (max-aspect-ratio: 1/1) {
-  .hero__lede { position: relative; }
-  .hero__lede::before {
+  .hero__sub { position: relative; }
+  .hero__sub::before {
     content: ""; position: absolute; inset: -3.5rem -6rem -3.5rem -4rem; z-index: -1;
     background: radial-gradient(closest-side, rgba(10, 9, 8, .94), rgba(10, 9, 8, .82) 62%, transparent);
   }
@@ -456,20 +448,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .manifesto__text .goth { font-size: 1.1em; line-height: .9; }
 .js-ready .manifesto__text .w { opacity: .13; transition: opacity .4s linear; }
 .js-ready .manifesto__text .w.on { opacity: 1; }
-
-/* La última frase y el sello comparten fila: el sello queda pegado al cierre del manifiesto */
-.manifesto__end { display: flex; align-items: center; gap: clamp(.8rem, 2.4vw, 2.6rem); }
-.manifesto__end p { min-width: 0; }
-.badge {
-  position: relative; flex: none;
-  display: grid; place-items: center; overflow: hidden;
-  width: clamp(6.5rem, 10.5vw, 10rem); aspect-ratio: 1;
-  color: var(--cream);
-}
-.badge__ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; animation: spin 18s linear infinite; }
-.badge__ring text { font: 700 13.5px var(--f-sans); font-stretch: 112%; letter-spacing: .04em; fill: currentColor; }
-.badge__bolt { width: 26%; height: 36%; color: var(--orange); }
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ---------- La banda ---------- */
 .band { padding-block: clamp(3rem, 7vw, 7rem) clamp(4rem, 9vw, 8rem); }
@@ -917,11 +895,7 @@ html.is-locked { overflow: hidden; }
   .hero__name { font-stretch: 68%; font-size: 17.6vw; transform: scaleY(1.2); transform-origin: bottom; }
   .hero__los { margin-bottom: .34em; }
   .hero__tag { margin-top: -.5em; }
-  .hero__foot { flex-direction: column; align-items: flex-start; gap: 1.2rem; margin-top: 3rem; }
-  /* Orden en móvil: subtítulo, botón y, debajo, los escenarios */
-  .hero__lede { display: contents; }
-  .hero__sub { max-width: none; }
-  .hero__proof { order: 3; margin-top: 0; }
+  .hero__foot { flex-direction: column; align-items: flex-start; gap: 1.4rem; margin-top: 3.4rem; }
   .hero__cta { flex-wrap: wrap; gap: .9rem 1.1rem; max-width: 100%; }
   .hero__cta .btn { padding-inline: 1.25em; }
 
