@@ -889,8 +889,7 @@ html.is-locked { overflow: hidden; }
       linear-gradient(to bottom, rgba(10, 9, 8, .9), rgba(10, 9, 8, .8) 12%, transparent 24%),
       linear-gradient(to bottom, transparent 44%, rgba(10, 9, 8, .86) 64%, var(--bg));   /* oscurece bajo el título, donde van el subtítulo y el botón */
   }
-  .hero__meta { letter-spacing: .16em; }
-  .hero__meta span:first-child { display: none; }   /* «Jaleo Band» ya está en el sello del título */
+  .hero__meta { flex-wrap: wrap; gap: .35rem 1rem; letter-spacing: .16em; }   /* las dos etiquetas no caben en una línea: van una bajo otra */
   .hero__name { font-stretch: 68%; font-size: 17.6vw; transform: scaleY(1.2); transform-origin: bottom; }
   .hero__los { margin-bottom: .34em; text-shadow: 0 .03em .28em rgba(10, 9, 8, .85); }   /* ahora cae sobre las rayas del rayo */
   .hero__tag { margin-top: -.5em; }
@@ -914,10 +913,14 @@ html.is-locked { overflow: hidden; }
   .dot { display: none; }
 }
 
+/* «Pedir fecha y presupuesto» es largo: en móvil la letra se ajusta al ancho para que quepa en una línea */
+@media (max-width: 480px) {
+  .btn--xl { padding-inline: 1.2em; font-size: min(1.05rem, calc((100vw - 2rem) / 24)); }
+}
+
 /* ---------- Móviles estrechos ---------- */
 @media (max-width: 380px) {
   .brand__name { font-size: 1.25rem; }
-  .btn--xl { padding-inline: 1.3em; font-size: .95rem; }
   .contact__fast .btn { padding-inline: 1em; font-size: .75rem; }
 }
 

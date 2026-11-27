@@ -890,7 +890,7 @@
       if (el.name === 'nombre') return 'Nos falta tu nombre.';
       if (el.name === 'evento') return 'Elige el tipo de evento.';
       if (el.name === 'fecha') return v.rangeUnderflow ? 'Esa fecha ya ha pasado.' : 'Esa fecha no es válida.';
-      if (el.name === 'privacidad') return 'Para enviarla, acepta la política de privacidad.';
+      if (el.name === 'privacidad') return 'Antes de enviar, acepta la política de privacidad.';
       return el.validationMessage;
     };
 
